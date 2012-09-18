@@ -99,6 +99,7 @@ public:
 		if(!fragmented) return &list[index];
 		else
 		{
+			cout << "in at call.\n";
 			if(index < lastIti)
 			{
 				lastIti = 0;
@@ -111,14 +112,40 @@ public:
 	
 	}
 
-	void push_front(T item);
-	void push_back(T item);
-
-	void insert(T item, int index)
+	void push_front(T item)
 	{
 		fragListNode *nnode = new fragListNode;
 		nnode->data = item;
+		nnode->next = head;
+		head->prev = nnode;
+		head = nnode;
+		nnode->prev = NULL;
+		fragmented = true;
+	}
+
+	void push_back(T item)
+	{
+		//this function seems like it shouldnt need to fragment the list...
+		fragListNode *nnode = new fragListNode;
+		nnode->data = item;
+
+		//just keep a tail pointer, idiot.
+		nnode->prev = at(Size-1)->next;
+		
+		nnode->prev->next = nnode;
+		nnode->next = NULL;
+
+	}
+
+	void insert(T item, int index)
+	{
+		cout << "inserting at: " << index << "\n";
+		cout << "list size is: " << Size << "\n";
+		fragListNode *nnode = new fragListNode;
+		nnode->data = item;
 		fragListNode *temp = at(index);
+		cout << "after at call\n";
+		cout << "inserting after value: " << temp->data << "\n";
 		nnode->next = temp;
 		if(index > 0)
 		{
@@ -128,11 +155,13 @@ public:
 		}
 		else
 		{
+			cout << "index is 0\n";
 			nnode->prev = NULL;
 			head = nnode;
 		}
 		fragmented = true;
 		Size++;
+		cout << "insertion made\n";
 	}
 
 	void erase(unsigned int index)

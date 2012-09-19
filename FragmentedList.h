@@ -99,7 +99,6 @@ public:
 		if(!fragmented) return &list[index];
 		else
 		{
-			cout << "in at call.\n";
 			if(index < lastIti)
 			{
 				lastIti = 0;
@@ -138,14 +137,10 @@ public:
 	}
 
 	void insert(T item, int index)
-	{
-		cout << "inserting at: " << index << "\n";
-		cout << "list size is: " << Size << "\n";
+	{	
 		fragListNode *nnode = new fragListNode;
 		nnode->data = item;
 		fragListNode *temp = at(index);
-		cout << "after at call\n";
-		cout << "inserting after value: " << temp->data << "\n";
 		nnode->next = temp;
 		if(index > 0)
 		{
@@ -155,13 +150,13 @@ public:
 		}
 		else
 		{
-			cout << "index is 0\n";
 			nnode->prev = NULL;
 			head = nnode;
 		}
 		fragmented = true;
 		Size++;
-		cout << "insertion made\n";
+		if(index <= lastIti)
+			lastIti++;
 	}
 
 	void erase(unsigned int index)

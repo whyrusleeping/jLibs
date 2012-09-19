@@ -31,6 +31,25 @@ public:
 		resize(initialSize);	
 	}
 
+	~FragmentedList()
+	{
+		fragListNode *temp = NULL;
+		for(fragListNode *i = head; i != NULL;)
+		{
+			if(i > list && i < list + (sizeof(fragListNode) * blockSize))
+			{
+				i = i->next;		
+			}
+			else
+			{
+				temp = i;
+				i = i->next;
+				delete temp;
+			}
+		}
+
+	}
+
 	void resize(int nSize)
 	{
 		Size = nSize;
@@ -140,7 +159,7 @@ public:
 	{	
 		fragListNode *nnode = new fragListNode;
 		nnode->data = item;
-		fragListNode *temp = at(index);
+		fragListNode *temp = at(index);	
 		nnode->next = temp;
 		if(index > 0)
 		{
@@ -151,6 +170,7 @@ public:
 		else
 		{
 			nnode->prev = NULL;
+			temp->prev = nnode;
 			head = nnode;
 		}
 		fragmented = true;

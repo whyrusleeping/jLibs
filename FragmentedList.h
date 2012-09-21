@@ -47,7 +47,7 @@ public:
 				delete temp;
 			}
 		}
-
+		delete[] list;
 	}
 
 	void resize(int nSize)
@@ -125,9 +125,7 @@ public:
 			}			
 			for(;lastIti < index; lastIti++, lastIt = lastIt->next);
 			return lastIt;
-		
 		}
-	
 	}
 
 	void push_front(T item)
@@ -139,6 +137,14 @@ public:
 		head = nnode;
 		nnode->prev = NULL;
 		fragmented = true;
+		Size++;
+	}
+
+	T pop_front()
+	{
+		T ret = head->data;
+		erase(0);
+		return ret;		
 	}
 
 	void push_back(T item)
@@ -152,12 +158,23 @@ public:
 		
 		nnode->prev->next = nnode;
 		nnode->next = NULL;
+		Size++;
 
 	}
 
 	void insert(T item, int index)
 	{	
-		fragListNode *nnode = new fragListNode;
+		fragListNode *nnode; 
+		
+		//attempt to reuse memory
+		if(freeSpots == NULL)
+			nnode = new fragListNode;
+		else
+		{
+			nnode = freeSpots;
+			freeSpots = freeSpots->next;
+		}
+
 		nnode->data = item;
 		fragListNode *temp = at(index);	
 		nnode->next = temp;
@@ -201,10 +218,20 @@ public:
 			n->prev->next = n->next;
 		}
 
+		//manage the now unused memory`
 		if(!(n >= list && n <= list + (sizeof(fragListNode) * blockSize)))
 		{	
 			delete n;
 		}
+		else
+		{
+			if(freeSpots == NULL)
+				n->next = NULL;
+			else
+				n->next = freeSpots;
+			freeSpots = n;
+		}
+
 		Size--;		
 		if(index < lastIti)
 		{
@@ -222,6 +249,7 @@ private:
 	fragListNode *list; //a pointer to the lists main block of memory
 	fragListNode *head;	//a pointer to the first item in the list
 	fragListNode *lastIt; //a pointer to the last iterator used
+	fragListNode *freeSpots; //a stack of unused memory spots in the main memory block;
 	int lastIti; //index of the last iterator used
 	int Size; //number of items in the list
 	int blockSize; //size (in items) of the lists main memory block

@@ -84,37 +84,15 @@ public:
 	void defrag()
 	{
 		/*
-		// An attempt to just move the memory up 
+		 * An attempt to just move the memory up 
 		if(blockSize > Size)
 		{
-			fragListNode *tempA;// = new fragListNode;
+			T tempA;
 			T tempB;
 			fragListNode *it = head;
 			int i = 0;
 			
-			for(; i < Size; i++)
-			{	
-				tempA = new fragListNode;
-				memcpy(tempA, &list[i], sizeof(fragListNode));
-				if(tempA->prev != NULL)
-					tempA->prev->next = temp;
-				if(tempA->next != NULL)
-					tempA->next->prev = temp;
-
-				memcpy(&list[i], it, sizeof(fragListNode));
-				list[i].next = it.next;
-				list[i].prev = it.prev;
-				tempA = it;
-				it = it->next;
-				if(it != NULL)
-				{	
-					it->prev->prev = NULL;
-					it->prev->next = NULL;			
-				}
-				if(tempA < list || tempA >= list + (blockSize * sizeof(fragListNode)))
-					delete tempA;
-
-			}
+			for(; i < Size && it == &list[i]; i++, it = it->next);
 
 			
 		}*/

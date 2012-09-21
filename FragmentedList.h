@@ -33,8 +33,6 @@ public:
 
 	~FragmentedList()
 	{	
-		cout << "in destructor.\n";
-		cout << "block located at " << list << " is " << blockSize << " long.\n";
 		fragListNode *temp = NULL;
 		for(fragListNode *i = head; i != NULL;)
 		{
@@ -44,15 +42,12 @@ public:
 			}
 			else
 			{
-				cout << "memory at " << i << " is out of range of the block.\n";
 				temp = i;
 				i = i->next;
 				delete temp;
 			}
 		}
-		cout << "calling delete list.\n";
 		delete[] list;
-		cout << "list deleted.\n";
 	}
 
 	void resize(int nSize)
@@ -123,17 +118,12 @@ public:
 		if(!fragmented) return &list[index];
 		else
 		{
-			cout << "returning index: " << index << " list size: " << Size << "\n";
 			if(index < lastIti || true)
 			{
 				lastIti = 0;
 				lastIt = head;
 			}			
-			for(;lastIti < index; lastIti++, lastIt = lastIt->next)
-			{
-			//	cout << "i: " << lastIti << " addr: " << lastIt << " value: " << lastIt->data <<  " next: " << lastIt->next <<  "\n";
-			}	
-			cout << "returning memory at: " << lastIt << "\n";
+			for(;lastIti < index; lastIti++, lastIt = lastIt->next);
 			return lastIt;
 		}
 	}
@@ -208,7 +198,6 @@ public:
 
 	void erase(unsigned int index)
 	{
-		cout << "entering erase.\n";
 		fragListNode *n = at(index);
 
 		if(n->next == NULL)
@@ -228,7 +217,6 @@ public:
 			n->next->prev = n->prev;
 			n->prev->next = n->next;
 		}
-		cout << "managing memory now.\n";
 		//manage the now unused memory`
 		if(!(n >= list && n <= list + (sizeof(fragListNode) * blockSize)))
 		{	
@@ -236,13 +224,11 @@ public:
 		}
 		else
 		{	
-			cout << "adding memory to stack.\n";
 			if(freeSpots == NULL)
 				n->next = NULL;
 			else
 				n->next = freeSpots;
 			freeSpots = n;
-			cout << "added memory to stack.\n";
 		}
 
 		Size--;		
@@ -256,7 +242,6 @@ public:
 			lastIti = 0;
 			lastIt = head;
 		}
-		cout << "erase function complete.\n";
 	}
 private:
 

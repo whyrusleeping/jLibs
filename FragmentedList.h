@@ -20,39 +20,27 @@ public:
 	typedef struct _fragListNode<T> fragListNode;
 	FragmentedList()
 	{
-		list = NULL;
-		head = NULL;
-		freeSpots = NULL;
-		Size = 0;
-		fragmented = false;
+		init();
 	}
 
 	FragmentedList(int initialSize)
 	{
+		init();
 		resize(initialSize);	
 	}
 
 	~FragmentedList()
 	{	
-		fragListNode *temp = NULL;
-		for(fragListNode *i = head; i != NULL;)
-		{
-			if(i >= list && i < list + (sizeof(fragListNode) * blockSize))
-			{
-				i = i->next;		
-			}
-			else
-			{
-				temp = i;
-				i = i->next;
-				delete temp;
-			}
-		}
-		delete[] list;
+		clean();
 	}
 
 	void resize(int nSize)
 	{
+		// Should this actually resize the current block or
+		// just reinitialize? Might call it reset.
+		if ( blockSize != 0 || Size != 0 )
+			clean();
+
 		Size = nSize;
 		blockSize = Size;
 		freeSpots = NULL;
@@ -243,6 +231,42 @@ public:
 		}
 	}
 private:
+	
+	void clean()
+	{
+		fragListNode *temp = NULL;
+		for(fragListNode *i = head; i != NULL;)
+		{
+			if(i >= list && i < list + (sizeof(fragListNode) * blockSize))
+			{
+				i = i->next;		
+			}
+			else
+			{
+				temp = i;
+				i = i->next;
+				delete temp;
+			}
+		}
+		delete[] list;
+		
+		list = NULL;
+		head = NULL;
+		freeSpots = NULL;
+		Size = 0;
+		fragmented = false;
+	}
+
+	void init()
+	{
+	
+		list = NULL;
+		head = NULL;
+		freeSpots = NULL;
+		Size = 0;
+		blockSize = 0;
+		fragmented = false;
+	}
 
 	fragListNode *list; //a pointer to the lists main block of memory
 	fragListNode *head;	//a pointer to the first item in the list

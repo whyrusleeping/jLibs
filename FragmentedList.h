@@ -22,6 +22,7 @@ public:
 	{
 		list = NULL;
 		head = NULL;
+		freeSpots = NULL;
 		Size = 0;
 		fragmented = false;
 	}
@@ -54,6 +55,7 @@ public:
 	{
 		Size = nSize;
 		blockSize = Size;
+		freeSpots = NULL;
 		list = new fragListNode[nSize];
 		head = list;
 		link();
@@ -224,10 +226,7 @@ public:
 		}
 		else
 		{	
-			if(freeSpots == NULL)
-				n->next = NULL;
-			else
-				n->next = freeSpots;
+			n->next = freeSpots;
 			freeSpots = n;
 		}
 

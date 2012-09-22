@@ -50,7 +50,7 @@ public:
 				temp = i;
 				i = i->next;
 				cout << "deleting external memory.\n";
-				//delete temp;
+				delete temp;
 				cout << "external memory deleted.\n";
 			}
 		}
@@ -111,6 +111,8 @@ public:
 			it = it->next;
 		}
 		head = temp;
+		//freeSpots was keeping track of memory that was being deleted, and when i went to delete it, was causing the system to freak out
+		freeSpots = NULL;
 		delete[] list;
 		list = head;
 		link();	

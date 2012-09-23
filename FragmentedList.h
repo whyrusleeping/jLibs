@@ -34,27 +34,20 @@ public:
 
 	~FragmentedList()
 	{	
-		cout << "destructor-ing.\n";
-		cout << "main block is at: " << list << " size is: " << blockSize << "\n";
 		fragListNode *temp = NULL;
 		for(fragListNode *i = head; i != NULL;)
 		{
 			if(i >= list && i < list + (sizeof(fragListNode) * blockSize))
 			{
-				cout << i << " is in the main block.\n";
 				i = i->next;		
 			}
 			else
 			{
-				cout << i << " is not in the main block.\n";
 				temp = i;
 				i = i->next;
-				cout << "deleting external memory.\n";
 				delete temp;
-				cout << "external memory deleted.\n";
 			}
 		}
-		cout << "deleting main block.\n";
 		delete[] list;
 	}
 
@@ -185,16 +178,12 @@ public:
 			nnode = new fragListNode;
 		else
 		{
-			cout << "reusing memory at " << freeSpots << "\n";
 			nnode = freeSpots;
 			freeSpots = freeSpots->next;
-			cout << "memory reassigned.\n";
 		}
 
 		nnode->data = item;
-		cout << "calling at.\n";
 		fragListNode *temp = at(index);	
-		cout << "after at.\n";
 		nnode->next = temp;
 		if(index > 0)
 		{
@@ -212,7 +201,6 @@ public:
 		Size++;
 		if(index <= lastIti)
 			lastIti++;
-		cout << "insertion finished.\n";
 	}
 
 	void erase(unsigned int index)
@@ -243,7 +231,6 @@ public:
 		}
 		else
 		{	
-			cout << "adding " << n << " to reuse stack.\n";
 			if(freeSpots == NULL)
 				n->next = NULL;
 			else

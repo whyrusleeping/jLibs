@@ -66,6 +66,42 @@ public:
 		return Size;
 	}
 
+	void _defrag()
+	{
+		
+	}
+
+	void _swap_nodes(fragListNode * first, fragListNode * second)
+	{
+		fragListNode node_temp_first;
+		fragListNode node_temp_second;
+
+		fragListNode * first_addr 	= NULL;
+		fragListNode * second_addr 	= NULL;
+
+		// Copy over the contents
+		node_temp_first 	= * first;
+		node_temp_second 	= * second;
+
+		// Store the addresses;
+		first_addr 		= first;
+		second_addr 	= second;
+
+		// Swap the data
+		(first)->data 	= node_temp_second.data
+		(second)->data = node_temp_first.data;
+
+		// Swap the points
+		(second)->next = node_temp_first.prev;
+		(first)->prev  = node_temp_second.next;
+
+		// Swap the "surounding" pointers
+		node_temp_first.prev->next = node_temp_second.next;
+		node_temp_first.next->prev = node_temp_first.prev;
+
+
+	}
+
 	void defrag()
 	{
 		/*
@@ -81,21 +117,42 @@ public:
 
 			
 		}*/
-		
-		fragListNode *temp = new fragListNode[Size];
-		fragListNode *it = head;
-
-		for(int i = 0; i < Size; i++)
+		if ( Size <= blockSize )
 		{
-			temp[i].data = it->data;
-			it = it->next;
+			// Everyting will fit				
+			fragListNode * list_temp = NULL, * head_temp = NULL;
+			fragListNode node_temp;
+
+			list_temp = list;
+			head_temp = head;
+
+			unsigned int sizeof_node = sizeof(fragListNode);
+			
+			// Move up through the block until the list gets out of sync
+			for ( ; list_temp == head_temp; list_temp += sizeof_node, head_temp = head_temp->next );
+						
+				
+			
+
 		}
-		head = temp;
-		delete[] list;
-		list = head;
-		link();	
-		blockSize = Size;		
-		fragmented = false;	
+		else
+		{
+		  fragListNode *temp = new fragListNode[Size];
+		  fragListNode *it = head;
+
+		  for(int i = 0; i < Size; i++)
+		  {
+			  temp[i].data = it->data;
+			  it = it->next;
+		  }
+
+		  head = temp;
+		  delete[] list;
+		  list = head;
+		  link();	
+		  blockSize = Size;		
+		  fragmented = false;	
+		}
 	}
 
 	T &operator[] (int index)

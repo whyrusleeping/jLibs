@@ -10,6 +10,7 @@ struct _fragListNode
 	struct _fragListNode *prev;
 	struct _fragListNode *next;
 	T data;
+	unsigned char freeFlag;
 };
 
 template <class T>
@@ -27,6 +28,7 @@ public:
 	{
 		init();
 		resize(initialSize);	
+		freeSpots = NULL;
 	}
 
 	~FragmentedList()
@@ -47,6 +49,8 @@ public:
 		list = new fragListNode[nSize];
 		head = list;
 		link();
+		lastIti = 0;
+		lastIt = head;
 	}
 
 	void link()
@@ -73,6 +77,8 @@ public:
 
 	void _swap_nodes(fragListNode * first, fragListNode * second)
 	{
+		cout << "_swap_nodes\n";
+		cout << "first[" << first << "] second[" << second << "]\n";
 		fragListNode node_temp_first;
 		fragListNode node_temp_second;
 
@@ -80,25 +86,56 @@ public:
 		fragListNode * second_addr 	= NULL;
 
 		// Copy over the contents
-		node_temp_first 	= * first;
-		node_temp_second 	= * second;
+		node_temp_first.data 	= first->data;
+		node_temp_first.next  = first->next;
+		node_temp_first.prev  = first->prev;
+
+
+		node_temp_second.data = second->data;
+		node_temp_second.next = second->next;
+		node_temp_second.prev = second->prev;
 
 		// Store the addresses;
-		first_addr 		= first;
-		second_addr 	= second;
+		first_addr 	= first;
+		second_addr	= second;
 
 		// Swap the data
-		(first)->data 	= node_temp_second.data
+		(first)->data  = node_temp_second.data;
 		(second)->data = node_temp_first.data;
 
+
+		cout << "first.data ["<<first->data<<"] second.data ["<<second->data<<"]\n";
 		// Swap the points
-		(second)->next = node_temp_first.prev;
-		(first)->prev  = node_temp_second.next;
+		
+		// DON'T SWAP IF NODE_FIRST IS A FREESPOT
+		//if ( first->freeFlag != 1 )
+		  (second)->next = node_temp_first.next;
 
+		// DON'T SWAP IF NODE_FIRST IS A FREESPOT
+		//if ( first->freeFlag != 1 )
+		  (first)->prev  = node_temp_second.prev;
+	
+		if ( first->freeFlag != 1 )
+		{
+			(first)->next  = node_temp_first.prev;
+			(second)->prev = node_temp_second.next;
+		}
+		else
+		{
+			(first)->next  = node_temp_second.next;
+			(second)->prev = node_temp_first.prev;
+		}
 		// Swap the "surounding" pointers
-		node_temp_first.prev->next = node_temp_second.next;
-		node_temp_first.next->prev = node_temp_first.prev;
+		if (node_temp_second.prev != NULL)
+			node_temp_second.prev->next = node_temp_second.next;
 
+		if (node_temp_first.next != NULL /*&& first->freeFlag == 1*/)
+			node_temp_first.next->prev = node_temp_first.prev;
+
+		if ( first->freeFlag == 1 )
+		{
+			first->next->prev = first;
+		}
 
 	}
 
@@ -117,26 +154,81 @@ public:
 
 			
 		}*/
+		cout << "Block size [" << Size << " <= " << blockSize << "]\n";
 		if ( Size <= blockSize )
 		{
-			// Everyting will fit				
+		  // Everyting will fit				
 			fragListNode * list_temp = NULL, * head_temp = NULL;
-			fragListNode node_temp;
+			fragListNode * node_temp = NULL;
 
 			list_temp = list;
 			head_temp = head;
 
+			while ( head_temp != NULL )
+			{
+				cout << "[" << head_temp->prev << "]= " << head_temp << "{" << head_temp->data << "}" << " =[" << head_temp->next << "]\n";
+				head_temp = head_temp->next;
+			}
+			head_temp = head;
 			unsigned int sizeof_node = sizeof(fragListNode);
 			
 			// Move up through the block until the list gets out of sync
-			for ( ; list_temp == head_temp; list_temp += sizeof_node, head_temp = head_temp->next );
-						
-				
-			
+			for ( ; list_temp == head_temp; list_temp += 1, head_temp = head_temp->next )
+			{
+				cout << "1list_temp[" << list_temp << "] head_temp[" << head_temp << "]\n";
+			}
+				cout << "2list_temp[" << list_temp << "] head_temp[" << head_temp << "]\n";
+		
+			// No free spots?
+			unsigned short allocated_mem = 0;
+			unsigned short push_mem_to_stack = 0;
+			if ( freeSpots != NULL )
+			{
+				push_mem_to_stack = 1;
+				node_temp = freeSpots;
+				freeSpots = freeSpots->next;
+			}
+			else if( list_temp == freeSpots )
+			{
+				allocated_mem = 1;
+				node_temp = new fragListNode;
+
+				node_temp->next = NULL;
+				node_temp->prev = NULL;
+			}
+
+
+			cout << "3list_temp[" << list_temp << "] head_temp[" << head_temp << "]\n";
+			if (list_temp == freeSpots )
+		  {
+				_swap_nodes(list_temp, node_temp);
+				cout << "4list_temp[" << list_temp << "] node_temp[" << node_temp << "]\n";
+			}
+		
+			if ( head_temp != NULL )
+				_swap_nodes(list_temp, head_temp);
+		
+			cout << "5list_temp[" << list_temp << "] head_temp[" << head_temp << "]\n";
+		
+			if ( allocated_mem == 0 && push_mem_to_stack == 1 )
+			{
+				cout << "Pushing back to stack\n";
+				head_temp->next = freeSpots;
+				head_temp->prev = NULL;
+
+				freeSpots = head_temp;
+			}	
+
+			head_temp = head;
+			while ( head_temp != NULL )
+			{
+				cout << "[" << head_temp->prev << "]= " << head_temp << "{" << head_temp->data << "}" << " =[" << head_temp->next << "]\n";
+				head_temp = head_temp->next;
+			}
 
 		}
 		else
-		{
+		{ 
 		  fragListNode *temp = new fragListNode[Size];
 		  fragListNode *it = head;
 
@@ -147,12 +239,17 @@ public:
 		  }
 
 		  head = temp;
+		  
+		  //freeSpots was keeping track of memory that was being deleted, and when i went to delete it, was causing the system to freak out
+		  freeSpots = NULL;
 		  delete[] list;
 		  list = head;
 		  link();	
 		  blockSize = Size;		
 		  fragmented = false;	
-		}
+		  lastIti = 0;
+		  lastIt = head;
+	  }
 	}
 
 	T &operator[] (int index)
@@ -165,7 +262,7 @@ public:
 		if(!fragmented) return &list[index];
 		else
 		{
-			if(index < lastIti || true)
+			if(index < lastIti)// || true)
 			{
 				lastIti = 0;
 				lastIt = head;
@@ -182,6 +279,7 @@ public:
 		nnode->next = head;
 		head->prev = nnode;
 		head = nnode;
+		nnode->freeFlag = 0;
 		nnode->prev = NULL;
 		fragmented = true;
 		Size++;
@@ -203,6 +301,7 @@ public:
 		//just keep a tail pointer, idiot.
 		nnode->prev = at(Size-1)->next;
 		
+		nnode->freeFlag = 0;
 		nnode->prev->next = nnode;
 		nnode->next = NULL;
 		Size++;
@@ -211,8 +310,8 @@ public:
 
 	void insert(T item, int index)
 	{	
-		fragListNode *nnode = new fragListNode;
-		/*
+		fragListNode *nnode;// = new fragListNode;
+	
 		//attempt to reuse memory
 		if(freeSpots == NULL)
 			nnode = new fragListNode;
@@ -220,7 +319,9 @@ public:
 		{
 			nnode = freeSpots;
 			freeSpots = freeSpots->next;
-		}*/
+		}
+
+		nnode->freeFlag = 0;
 
 		nnode->data = item;
 		fragListNode *temp = at(index);	
@@ -237,6 +338,7 @@ public:
 			temp->prev = nnode;
 			head = nnode;
 		}
+		
 		fragmented = true;
 		Size++;
 		if(index <= lastIti)
@@ -272,6 +374,8 @@ public:
 		else
 		{	
 			n->next = freeSpots;
+			n->prev = NULL;
+			n->freeFlag = 1;
 			freeSpots = n;
 		}
 

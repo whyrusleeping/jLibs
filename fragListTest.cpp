@@ -5,9 +5,7 @@ using std::cout;
 
 int main()
 {
-	while(1)
-	{
-	FragmentedList<int> fList(50);
+/*	FragmentedList<int> fList(50);
 
 	srand(time(NULL));
 
@@ -58,9 +56,60 @@ int main()
 		cout << i << " ";
 		cout << fList[i] << "\n";
 	}
+*/
 
+	FragmentedList<int> * defrag;
+
+	defrag = new FragmentedList<int>(5);
+
+	for(int i = 0; i < 5; i++)
+	{
+		(*defrag)[i] = i;
 	}
 
-	return 0;
+	(*defrag).erase(1);
+	(*defrag).erase(1);
+	(*defrag).insert(1,1);
+	(*defrag).insert(2,2);
 
+	
+	for(int i = 0; i < (*defrag).size(); i++)
+	{
+		cout << i <<" " << (*defrag)[i] << "\n";
+	}
+	cout << "Defrag\n";
+	(*defrag).defrag();	
+
+	for(int i = 0; i < 5; i++)
+	{
+		cout << (*defrag)[i] << "\n";
+	}
+
+	delete defrag;
+	cout << "\n NEXT \n\n";
+	defrag = new FragmentedList<int>(5);
+
+	for(int i = 0; i < 5; i++)
+	{
+		(*defrag)[i] = i;
+	}
+
+	(*defrag).erase(1);
+	//(*defrag).erase(1);
+	//(*defrag).insert(1,1);
+	//(*defrag).insert(2,2);
+
+	
+	for(int i = 0; i < (*defrag).size(); i++)
+	{
+		cout << i <<" " << (*defrag)[i] << "\n";
+	}
+	cout << "Defrag\n";
+	(*defrag).defrag();	
+
+	for(int i = 0; i < 5; i++)
+	{
+		cout << (*defrag)[i] << "\n";
+	}
+	return 0;
 }

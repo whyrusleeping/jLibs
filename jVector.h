@@ -2,7 +2,6 @@
 #define __J_VECTOR_H__
 
 #include <iostream>
-#include "Person.h"
 
 using std::cout;
 template <class T>
@@ -72,7 +71,7 @@ int jVector::Size()
 	return size;
 }
 
-Person jVector::erase(int index)
+T jVector::erase(int index)
 {
 	for(; index < size - 1; index++)
 		(*this)[index] = (*this)[index+1];
@@ -82,7 +81,7 @@ Person jVector::erase(int index)
 template <class T>
 void jVector::push_back(T p)
 {
-	lis = (Person *)realloc(lis, ++size * sizeof(Person));
+	lis = (T *)realloc(lis, ++size * sizeof(T));
 	(*this)[size - 1] = p;
 }
 #endif

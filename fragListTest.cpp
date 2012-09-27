@@ -5,43 +5,44 @@ using std::cout;
 
 int main()
 {
-/*	FragmentedList<int> fList(50);
+	FragmentedList<int> fList(10);
 
-	srand(time(NULL));
+	srand(5);
 
-	for(int i = 0; i < 50; i++)
+	for(int i = 0; i < 10; i++)
 	{
 		fList[i] = i;
 	}
-	cout << "initial list:\n";
+	cout << "Initial List:\n";
 	for(int i = 0; i < fList.size(); i++)
 	{
-		cout << fList[i] << "\n";
+		cout << " " << fList[i] << "\n";
 	}
 
 
-	for(int i = 0; i < 35; i++)
+	for(int i = 0; i < 5; i++)
 		fList.erase(rand() % fList.size());
 
 
 //	fList.erase(0);
-	cout << "After erase: (fragmented)\n";
+	cout << "\n\nAfter Erase: (fragmented)\n";
 	for(int i = 0; i < fList.size(); i++)
 	{
-		cout << fList[i] << "\n";
+		cout << " " <<fList[i] << "\n";
 	}
 
 	fList.defrag();
-	cout << "After Defrag:\n";
+	cout << "\n\nAfter Defrag:\n";
 	for(int i = 0; i < fList.size(); i++)
 	{
-		cout << fList[i] << "\n";
+		cout << " " << fList[i] << "\n";
 	}
 
-	for(int i = 0; i < 10; i++)
+	cout << "\n\nInserting:\n";
+	for(int i = 0; i < 5; i++)
 	{
 		int iv = rand() % fList.size();
-		cout << "inserting at: " << iv << "\n";
+		cout << " list[" << iv << "]\n";
 		fList.insert(-52, iv);
 	}
 	//fList.insert(-52,fList.size() - 1);
@@ -49,14 +50,18 @@ int main()
 	//fList.insert(-98, 0);
 	//fList.insert(300, fList.size()-1);
 
-	cout << "After Insert:\n";
-	cout << "list size: " << fList.size() << "\n";
+	cout << "\n\nAfter Insert:\n";
+	cout << " List size: " << fList.size() << "\n";
 	for(int i = 0; i < fList.size(); i++)
 	{
-		cout << i << " ";
+		cout << " " << i << " : ";
 		cout << fList[i] << "\n";
 	}
-*/
+
+	cout << "\n == END OF TESTS == ";
+	return 0;
+
+	cout << "\n\n  === Static Tests === \n\n";
 
 	FragmentedList<int> * defrag;
 

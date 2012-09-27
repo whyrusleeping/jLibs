@@ -71,11 +71,6 @@ public:
 		return Size;
 	}
 
-	void _defrag()
-	{
-		
-	}
-
 	void _swap_nodes(fragListNode * first, fragListNode * second)
 	{
 		cout << "_swap_nodes\n";
@@ -88,7 +83,7 @@ public:
 		fragListNode * second_addr 	= NULL;
 
 		// Copy over the contents
-		node_temp_first.data 	= first->data;
+		node_temp_first.data  = first->data;
 		node_temp_first.next  = first->next;
 		node_temp_first.prev  = first->prev;
 
@@ -101,24 +96,26 @@ public:
 		first_addr 	= first;
 		second_addr	= second;
 
-		// Swap the data
+		// Swap the first
 		(first)->data  = node_temp_second.data;
 		(first)->prev  = node_temp_second.prev;
-	
 		
 		if ( node_temp_second.next == first_addr )  
 			(first)->next  = node_temp_first.prev;
 		else
 			(first)->next  = node_temp_second.next;
 
+
+		// Swap the second
 		(second)->data = node_temp_first.data;
 		(second)->next = node_temp_first.next;
 
-		
 		if ( node_temp_first.prev == second_addr )  
 		  (second)->prev = node_temp_second.next;
 		else
 		  (second)->prev = node_temp_first.prev;
+
+
 
 		cout << "first.data ["<<first->data<<"] second.data ["<<second->data<<"]\n";
 		
@@ -200,7 +197,7 @@ public:
 
 			cout << "3list_temp[" << list_temp << "] head_temp[" << head_temp << "]\n";
 			if (list_temp == freeSpots )
-		  {
+		  	{
 				_swap_nodes(list_temp, node_temp);
 				cout << "4list_temp[" << list_temp << "] node_temp[" << node_temp << "]\n";
 			}

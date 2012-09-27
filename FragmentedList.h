@@ -157,72 +157,79 @@ public:
 		  // Everyting will fit				
 			fragListNode * list_temp = NULL, * head_temp = NULL;
 			fragListNode * node_temp = NULL;
-
+			fragListNode * _temp = NULL;
+			int a = 0;
+			unsigned int sizeof_node = sizeof(fragListNode);
+		
 			list_temp = list;
 			head_temp = head;
-
-			while ( head_temp != NULL )
+			_temp = head;
+			while( list_temp->next != NULL )
 			{
-				cout << "[" << std::setfill('0')<< std::setw(9) << head_temp->prev << "]= " << std::setfill('0')<< std::setw(9) << head_temp << "{" << head_temp->data << "}" << " =[" << std::setfill('0')<< std::setw(9) << head_temp->next << "]\n";
-				head_temp = head_temp->next;
-			}
-			head_temp = head;
-			unsigned int sizeof_node = sizeof(fragListNode);
-			
-			// Move up through the block until the list gets out of sync
-			for ( ; list_temp == head_temp; list_temp += 1, head_temp = head_temp->next )
-			{
-				cout << "1list_temp[" << list_temp << "] head_temp[" << head_temp << "]\n";
-			}
-				cout << "2list_temp[" << list_temp << "] head_temp[" << head_temp << "]\n";
-		
-			// No free spots?
-			unsigned short allocated_mem = 0;
-			unsigned short push_mem_to_stack = 0;
-			if ( freeSpots != NULL )
-			{
-				push_mem_to_stack = 1;
-				node_temp = freeSpots;
-				freeSpots = freeSpots->next;
-			}
-			else if( list_temp == freeSpots )
-			{
-				allocated_mem = 1;
-				node_temp = new fragListNode;
+			  _temp = head;
+			  while ( _temp != NULL )
+			  {
+				  cout << "[" << std::setfill('0')<< std::setw(9) << _temp->prev << "]= " << std::setfill('0')<< std::setw(9) << _temp << "{" << _temp->data << "}" << " =[" << std::setfill('0')<< std::setw(9) << _temp->next << "]\n";
+				  _temp = _temp->next;
+			  }
+			  
+			  // Move up through the block until the list gets out of sync
+			  for ( ; list_temp == head_temp; list_temp += 1, head_temp = head_temp->next )
+			  {
+				  cout << "1list_temp[" << list_temp << "] head_temp[" << head_temp << "]\n";
+			  }
+				  cout << "2list_temp[" << list_temp << "] head_temp[" << head_temp << "]\n";
+		  
+			  // No free spots?
+			  unsigned short allocated_mem = 0;
+			  unsigned short push_mem_to_stack = 0;
+			  if ( freeSpots != NULL )
+			  {
+				  push_mem_to_stack = 1;
+				  node_temp = freeSpots;
+				  freeSpots = freeSpots->next;
+			  }
+			  else if( list_temp == freeSpots )
+			  {
+				  allocated_mem = 1;
+				  node_temp = new fragListNode;
 
-				node_temp->next = NULL;
-				node_temp->prev = NULL;
+				  node_temp->next = NULL;
+				  node_temp->prev = NULL;
+			  }
+
+
+			  cout << "3list_temp[" << list_temp << "] head_temp[" << head_temp << "]\n";
+			  if (list_temp == freeSpots )
+			  {
+				  _swap_nodes(list_temp, node_temp);
+				  cout << "4list_temp[" << list_temp << "] node_temp[" << node_temp << "]\n";
+			  }
+		  
+			  if ( head_temp != NULL )
+				  _swap_nodes(list_temp, head_temp);
+		  
+			  cout << "5list_temp[" << list_temp << "] head_temp[" << head_temp << "]\n";
+		  
+			  if ( allocated_mem == 0 && push_mem_to_stack == 1 )
+			  {
+				  cout << "Pushing back to stack\n";
+				  head_temp->next = freeSpots;
+				  head_temp->prev = NULL;
+
+				  freeSpots = head_temp;
+			  }	
+
+			  _temp = head;
+			  while ( _temp != NULL )
+			  {
+				  cout << "[" << std::setfill('0')<< std::setw(9) << _temp->prev << "]= " << std::setfill('0')<< std::setw(9) << _temp << "{" << _temp->data << "}" << " =[" << std::setfill('0')<< std::setw(9) << _temp->next << "]\n";
+				  _temp = _temp->next;
+			  }
+
+			  head_temp = list_temp;
+			//  std::cin >> a;
 			}
-
-
-			cout << "3list_temp[" << list_temp << "] head_temp[" << head_temp << "]\n";
-			if (list_temp == freeSpots )
-		  	{
-				_swap_nodes(list_temp, node_temp);
-				cout << "4list_temp[" << list_temp << "] node_temp[" << node_temp << "]\n";
-			}
-		
-			if ( head_temp != NULL )
-				_swap_nodes(list_temp, head_temp);
-		
-			cout << "5list_temp[" << list_temp << "] head_temp[" << head_temp << "]\n";
-		
-			if ( allocated_mem == 0 && push_mem_to_stack == 1 )
-			{
-				cout << "Pushing back to stack\n";
-				head_temp->next = freeSpots;
-				head_temp->prev = NULL;
-
-				freeSpots = head_temp;
-			}	
-
-			head_temp = head;
-			while ( head_temp != NULL )
-			{
-				cout << "[" << std::setfill('0')<< std::setw(9) << head_temp->prev << "]= " << std::setfill('0')<< std::setw(9) << head_temp << "{" << head_temp->data << "}" << " =[" << std::setfill('0')<< std::setw(9) << head_temp->next << "]\n";
-				head_temp = head_temp->next;
-			}
-
 		}
 		else
 		{ 

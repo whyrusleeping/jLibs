@@ -86,7 +86,69 @@ int main()
 	}
 
 	delete defrag;
-	cout << "\n NEXT \n\n";
+	
+	cout << "\n\n Other Test \n\n";
+	defrag = new FragmentedList<int>(5);
+
+	for(int i = 0; i < 5; i++)
+	{
+		(*defrag)[i] = i;
+	}
+
+	(*defrag).erase(1);
+	(*defrag).erase(2);
+	(*defrag).insert(1,1);
+	(*defrag).insert(3,3);
+
+	
+	for(int i = 0; i < (*defrag).size(); i++)
+	{
+		cout << i <<" " << (*defrag)[i] << "\n";
+	}
+	cout << "Defrag\n";
+	(*defrag).defrag();	
+
+	for(int i = 0; i < 5; i++)
+	{
+		cout << (*defrag)[i] << "\n";
+	}
+
+	delete defrag;
+	cout << "\n\n Other Test 2 \n\n";
+	defrag = new FragmentedList<int>(7);
+
+	for(int i = 0; i < 7; i++)
+	{
+		(*defrag)[i] = i;
+	}
+
+	(*defrag).erase(1);
+	(*defrag).erase(3);
+	(*defrag).insert(1,1);
+	(*defrag).insert(4,4);
+
+	
+	for(int i = 0; i < (*defrag).size(); i++)
+	{
+		cout << i <<" " << (*defrag)[i] << "\n";
+	}
+	cout << "Defrag\n";
+	(*defrag).defrag();	
+
+	for(int i = 0; i < (*defrag).size(); i++)
+	{
+		cout << (*defrag)[i] << "\n";
+	}
+
+	delete defrag;
+	
+
+	// Below test still breaks
+	//
+	// The below test is when we use free spots
+
+
+	cout << "\n NEXT SOME OTHER\n\n";
 	defrag = new FragmentedList<int>(5);
 
 	for(int i = 0; i < 5; i++)
@@ -107,7 +169,7 @@ int main()
 	cout << "Defrag\n";
 	(*defrag).defrag();	
 
-	for(int i = 0; i < 5; i++)
+	for(int i = 0; i < (*defrag).size(); i++)
 	{
 		cout << (*defrag)[i] << "\n";
 	}

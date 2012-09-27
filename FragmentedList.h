@@ -2,6 +2,7 @@
 #define _FRAG_LIST_H_
 
 #include <iostream>
+#include <iomanip>
 using std::cout;
 
 template <class T>
@@ -78,7 +79,8 @@ public:
 	void _swap_nodes(fragListNode * first, fragListNode * second)
 	{
 		cout << "_swap_nodes\n";
-		cout << "first[" << first << "] second[" << second << "]\n";
+		cout << "first[" << std::hex << first << "] second[" <<  std::hex << second << "]\n";
+
 		fragListNode node_temp_first;
 		fragListNode node_temp_second;
 
@@ -101,41 +103,39 @@ public:
 
 		// Swap the data
 		(first)->data  = node_temp_second.data;
-		(second)->data = node_temp_first.data;
+		(first)->prev  = node_temp_second.prev;
+	
+		
+		if ( node_temp_second.next == first_addr )  
+			(first)->next  = node_temp_first.prev;
+		else
+			(first)->next  = node_temp_second.next;
 
+		(second)->data = node_temp_first.data;
+		(second)->next = node_temp_first.next;
+
+		
+		if ( node_temp_first.prev == second_addr )  
+		  (second)->prev = node_temp_second.next;
+		else
+		  (second)->prev = node_temp_first.prev;
 
 		cout << "first.data ["<<first->data<<"] second.data ["<<second->data<<"]\n";
-		// Swap the points
 		
-		// DON'T SWAP IF NODE_FIRST IS A FREESPOT
-		//if ( first->freeFlag != 1 )
-		  (second)->next = node_temp_first.next;
 
-		// DON'T SWAP IF NODE_FIRST IS A FREESPOT
-		//if ( first->freeFlag != 1 )
-		  (first)->prev  = node_temp_second.prev;
-	
-		if ( first->freeFlag != 1 )
-		{
-			(first)->next  = node_temp_first.prev;
-			(second)->prev = node_temp_second.next;
-		}
-		else
-		{
-			(first)->next  = node_temp_second.next;
-			(second)->prev = node_temp_first.prev;
-		}
+
 		// Swap the "surounding" pointers
 		if (node_temp_second.prev != NULL)
-			node_temp_second.prev->next = node_temp_second.next;
+			node_temp_second.prev->next = first_addr;
 
-		if (node_temp_first.next != NULL /*&& first->freeFlag == 1*/)
-			node_temp_first.next->prev = node_temp_first.prev;
+		if (node_temp_first.next != NULL)
+			node_temp_first.next->prev = second_addr;
 
-		if ( first->freeFlag == 1 )
-		{
-			first->next->prev = first;
-		}
+		if (node_temp_first.prev != NULL && node_temp_first.prev != second_addr  )
+			node_temp_first.prev->next = second_addr;
+
+		if (node_temp_second.next != NULL && node_temp_second.next != first_addr )
+			node_temp_second.next->prev = first_addr;
 
 	}
 
@@ -166,7 +166,7 @@ public:
 
 			while ( head_temp != NULL )
 			{
-				cout << "[" << head_temp->prev << "]= " << head_temp << "{" << head_temp->data << "}" << " =[" << head_temp->next << "]\n";
+				cout << "[" << std::setfill('0')<< std::setw(9) << head_temp->prev << "]= " << std::setfill('0')<< std::setw(9) << head_temp << "{" << head_temp->data << "}" << " =[" << std::setfill('0')<< std::setw(9) << head_temp->next << "]\n";
 				head_temp = head_temp->next;
 			}
 			head_temp = head;
@@ -222,7 +222,7 @@ public:
 			head_temp = head;
 			while ( head_temp != NULL )
 			{
-				cout << "[" << head_temp->prev << "]= " << head_temp << "{" << head_temp->data << "}" << " =[" << head_temp->next << "]\n";
+				cout << "[" << std::setfill('0')<< std::setw(9) << head_temp->prev << "]= " << std::setfill('0')<< std::setw(9) << head_temp << "{" << head_temp->data << "}" << " =[" << std::setfill('0')<< std::setw(9) << head_temp->next << "]\n";
 				head_temp = head_temp->next;
 			}
 

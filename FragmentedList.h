@@ -2,6 +2,7 @@
 #define _FRAG_LIST_H_
 
 #include <iostream>
+#include <iomanip>
 using std::cout;
 
 template <class T>
@@ -10,6 +11,7 @@ struct _fragListNode
 	struct _fragListNode *prev;
 	struct _fragListNode *next;
 	T data;
+	unsigned char freeFlag;
 };
 
 template <class T>
@@ -35,42 +37,31 @@ public:
 	typedef struct _fragListNode<T> fragListNode;
 	FragmentedList()
 	{
-		list = NULL;
-		head = NULL;
-		Size = 0;
-		fragmented = false;
+		init();
 	}
 
 	FragmentedList(int initialSize)
 	{
+		init();
 		resize(initialSize);	
 		freeSpots = NULL;
 	}
 
 	~FragmentedList()
 	{	
-		fragListNode *temp = NULL;
-		for(fragListNode *i = head; i != NULL;)
-		{	
-			
-			if(i >= list && i < list + (sizeof(fragListNode) * blockSize))
-			{
-				i = i->next;	
-			}
-			else
-			{
-				temp = i;
-				i = i->next;
-				delete temp;
-			}
-		}
-		delete[] list;
+		clean();
 	}
 
 	void resize(int nSize)
 	{
+		// Should this actually resize the current block or
+		// just reinitialize? Might call it reset.
+		if ( blockSize != 0 || Size != 0 )
+			clean();
+
 		Size = nSize;
 		blockSize = Size;
+		freeSpots = NULL;
 		list = new fragListNode[nSize];
 		head = list;
 		link();
@@ -95,6 +86,71 @@ public:
 		return Size;
 	}
 
+	void _swap_nodes(fragListNode * first, fragListNode * second)
+	{
+		//cout << "_swap_nodes\n";
+	//	cout << "first[" << std::hex << first << "] second[" <<  std::hex << second << "]\n";
+
+		fragListNode node_temp_first;
+		fragListNode node_temp_second;
+
+		fragListNode * first_addr 	= NULL;
+		fragListNode * second_addr 	= NULL;
+
+		// Copy over the contents
+		node_temp_first.data  = first->data;
+		node_temp_first.next  = first->next;
+		node_temp_first.prev  = first->prev;
+
+
+		node_temp_second.data = second->data;
+		node_temp_second.next = second->next;
+		node_temp_second.prev = second->prev;
+
+		// Store the addresses;
+		first_addr 	= first;
+		second_addr	= second;
+
+		// Swap the first
+		(first)->data  = node_temp_second.data;
+		(first)->prev  = node_temp_second.prev;
+		
+		if ( node_temp_second.next == first_addr )  
+			(first)->next  = node_temp_first.prev;
+		else
+			(first)->next  = node_temp_second.next;
+
+
+		// Swap the second
+		(second)->data = node_temp_first.data;
+		(second)->next = node_temp_first.next;
+
+		if ( node_temp_first.prev == second_addr )  
+		  (second)->prev = node_temp_second.next;
+		else
+		  (second)->prev = node_temp_first.prev;
+
+
+
+		//cout << "first.data ["<<first->data<<"] second.data ["<<second->data<<"]\n";
+		
+
+
+		// Swap the "surounding" pointers
+		if (node_temp_second.prev != NULL)
+			node_temp_second.prev->next = first_addr;
+
+		if (node_temp_first.next != NULL)
+			node_temp_first.next->prev = second_addr;
+
+		if (node_temp_first.prev != NULL && node_temp_first.prev != second_addr  )
+			node_temp_first.prev->next = second_addr;
+
+		if (node_temp_second.next != NULL && node_temp_second.next != first_addr )
+			node_temp_second.next->prev = first_addr;
+
+	}
+
 	void defrag()
 	{
 		/*
@@ -110,25 +166,131 @@ public:
 
 			
 		}*/
-		
-		fragListNode *temp = new fragListNode[Size];
-		fragListNode *it = head;
+		cout << "\n\n=================== DEFRAG ==================\n";
+		cout <<     "=================== DEFRAG ==================\n";
 
-		for(int i = 0; i < Size; i++)
+		cout << "  Block size [" << Size << " <= " << blockSize << "]\n";
+		cout <<     "=============================================\n";
+		cout <<     "=============================================\n";
+		if ( Size <= blockSize )
 		{
-			temp[i].data = it->data;
-			it = it->next;
+		  // Everyting will fit				
+			fragListNode * list_temp = NULL, * head_temp = NULL;
+			fragListNode * node_temp = NULL;
+			fragListNode * free_temp = NULL;
+			int shift = 0;
+			int defrag_count = 0;
+			unsigned int sizeof_node = sizeof(fragListNode);
+		
+			list_temp = list;
+			head_temp = head;
+			while( list_temp->next != NULL )
+			{
+			  free_temp = freeSpots;
+			  cout << "\n\n=============== DEFRAG [" << std::setfill('0') << std::setw(3) <<defrag_count << "] ============== ";
+			  cout << "   freeSpots \n\n"; 
+			  defrag_count++;
+			  shift = 0;
+			  while ( shift < blockSize )
+			  { 
+			  	if ( (list + shift)->freeFlag )
+			  	  cout << "F :: ";
+				else
+				  cout << "L :: ";
+				  cout << "[" << std::setfill('0')<< std::setw(9) << (list + shift)->prev << "]= " << std::setfill('0')<< std::setw(9) << (list + shift) << "{" << (int)(list + shift)->data << "}" << " =[" << std::setfill('0')<< std::setw(9) << (list + shift)->next << "]";
+				  
+				if ( free_temp->next != NULL )
+			  	{
+					cout << "    [" << std::setfill('0')<< std::setw(9) << free_temp << "]";  
+					free_temp = free_temp->next;
+				}
+				
+				cout << "\n";
+				shift++;
+			  }
+			  
+			  // Move up through the block until the list gets out of sync
+			  for ( ; list_temp == head_temp && list_temp->next != NULL ; list_temp += 1, head_temp = head_temp->next )
+			  {
+			///	  cout << "1list_temp[" << list_temp << "] head_temp[" << head_temp << "]\n";
+			  }
+			//	  cout << "2list_temp[" << list_temp << "] head_temp[" << head_temp << "]\n";
+		 
+		 	  if ( list_temp->next == NULL )
+			  break;
+			  // No free spots?
+			  unsigned short allocated_mem = 0;
+			  unsigned short push_mem_to_stack = 0;
+			  if ( freeSpots != NULL )
+			  {
+				  push_mem_to_stack = 1;
+				  node_temp = freeSpots;
+				  node_temp->freeFlag = 0;
+				  freeSpots = freeSpots->next;
+			  }
+			  else if( list_temp == freeSpots )
+			  {
+				  allocated_mem = 1;
+				  node_temp = new fragListNode;
+			          node_temp->freeFlag = 0;
+				  node_temp->next = NULL;
+				  node_temp->prev = NULL;
+			  }
+
+
+			  //cout << "3list_temp[" << list_temp << "] head_temp[" << head_temp << "]\n";
+			  if (list_temp == freeSpots )
+			  {
+				  _swap_nodes(list_temp, node_temp);
+			//	  cout << "4list_temp[" << list_temp << "] node_temp[" << node_temp << "]\n";
+			  }
+		  
+			  if ( head_temp != NULL )
+				  _swap_nodes(list_temp, head_temp);
+		  
+		          list_temp->freeFlag = 0;
+			  //cout << "5list_temp[" << list_temp << "] head_temp[" << head_temp << "]\n";
+		  
+			  if ( allocated_mem == 0 && push_mem_to_stack == 1 )
+			  {
+				 // cout << "Pushing back to stack\n";
+				  head_temp->next = freeSpots;
+				  head_temp->prev = NULL;
+				  head_temp->freeFlag = 1;
+				  freeSpots = head_temp;
+			  }
+
+			  if ( allocated_mem == 1 )
+			  	delete node_temp;
+
+
+			  head_temp = list_temp;
+			//  std::cin >> a;
+			}
 		}
-		head = temp;
-		//freeSpots was keeping track of memory that was being deleted, and when i went to delete it, was causing the system to freak out
-		freeSpots = NULL;
-		delete[] list;
-		list = head;
-		link();	
-		blockSize = Size;		
-		fragmented = false;	
-		lastIti = 0;
-		lastIt = head;
+		else
+		{ 
+		  fragListNode *temp = new fragListNode[Size];
+		  fragListNode *it = head;
+
+		  for(int i = 0; i < Size; i++)
+		  {
+			  temp[i].data = it->data;
+			  it = it->next;
+		  }
+
+		  head = temp;
+		  
+		  //freeSpots was keeping track of memory that was being deleted, and when i went to delete it, was causing the system to freak out
+		  freeSpots = NULL;
+		  delete[] list;
+		  list = head;
+		  link();	
+		  blockSize = Size;		
+		  fragmented = false;	
+		  lastIti = 0;
+		  lastIt = head;
+	  }
 	}
 
 	T &operator[] (int index)
@@ -158,6 +320,7 @@ public:
 		nnode->next = head;
 		head->prev = nnode;
 		head = nnode;
+		nnode->freeFlag = 0;
 		nnode->prev = NULL;
 		fragmented = true;
 		Size++;
@@ -179,6 +342,7 @@ public:
 		//just keep a tail pointer, idiot.
 		nnode->prev = at(Size-1)->next;
 		
+		nnode->freeFlag = 0;
 		nnode->prev->next = nnode;
 		nnode->next = NULL;
 		Size++;
@@ -196,7 +360,10 @@ public:
 		{
 			nnode = freeSpots;
 			freeSpots = freeSpots->next;
+			nnode->freeFlag = 0;
 		}
+
+		nnode->freeFlag = 0;
 
 		nnode->data = item;
 		fragListNode *temp = at(index);	
@@ -213,6 +380,7 @@ public:
 			temp->prev = nnode;
 			head = nnode;
 		}
+		
 		fragmented = true;
 		Size++;
 		if(index <= lastIti)
@@ -247,10 +415,9 @@ public:
 		}
 		else
 		{	
-			if(freeSpots == NULL)
-				n->next = NULL;
-			else
-				n->next = freeSpots;
+			n->next = freeSpots;
+			n->prev = NULL;
+			n->freeFlag = 1;
 			freeSpots = n;
 		}
 
@@ -267,6 +434,42 @@ public:
 		}
 	}
 private:
+	
+	void clean()
+	{
+		fragListNode *temp = NULL;
+		for(fragListNode *i = head; i != NULL;)
+		{
+			if(i >= list && i < list + (sizeof(fragListNode) * blockSize))
+			{
+				i = i->next;		
+			}
+			else
+			{
+				temp = i;
+				i = i->next;
+				delete temp;
+			}
+		}
+		delete[] list;
+		
+		list = NULL;
+		head = NULL;
+		freeSpots = NULL;
+		Size = 0;
+		fragmented = false;
+	}
+
+	void init()
+	{
+	
+		list = NULL;
+		head = NULL;
+		freeSpots = NULL;
+		Size = 0;
+		blockSize = 0;
+		fragmented = false;
+	}
 
 	fragListNode *list; //a pointer to the lists main block of memory
 	fragListNode *head;	//a pointer to the first item in the list

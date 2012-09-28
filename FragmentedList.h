@@ -13,6 +13,21 @@ struct _fragListNode
 };
 
 template <class T>
+class FragIterator
+{
+typedef struct _fragListNode<T> fragListNode;
+private:
+	fragListNode *node;
+
+public:
+	FragIterator();
+
+	FragIterator(fragListNode*);		
+
+
+};
+
+template <class T>
 class FragmentedList
 {
 public:
@@ -36,10 +51,11 @@ public:
 	{	
 		fragListNode *temp = NULL;
 		for(fragListNode *i = head; i != NULL;)
-		{
+		{	
+			
 			if(i >= list && i < list + (sizeof(fragListNode) * blockSize))
 			{
-				i = i->next;		
+				i = i->next;	
 			}
 			else
 			{

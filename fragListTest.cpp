@@ -7,7 +7,7 @@ int main()
 {
 	FragmentedList<int> fList(10);
 
-	srand(5);
+	srand(50);
 
 	for(int i = 0; i < 10; i++)
 	{
@@ -24,7 +24,6 @@ int main()
 		fList.erase(rand() % fList.size());
 
 
-//	fList.erase(0);
 	cout << "\n\nAfter Erase: (fragmented)\n";
 	for(int i = 0; i < fList.size(); i++)
 	{
@@ -47,8 +46,6 @@ int main()
 	}
 	//fList.insert(-52,fList.size() - 1);
 	//fList.insert(-52, 0);
-	//fList.insert(-98, 0);
-	//fList.insert(300, fList.size()-1);
 
 	cout << "\n\nAfter Insert:\n";
 	cout << " List size: " << fList.size() << "\n";
@@ -57,40 +54,9 @@ int main()
 		cout << " " << i << " : ";
 		cout << fList[i] << "\n";
 	}
-
 	cout << "\n == END OF TESTS == ";
 	return 0;
-
-	cout << "\n\n  === Static Tests === \n\n";
-
-	FragmentedList<int> * defrag;
-
-	defrag = new FragmentedList<int>(5);
-
-	for(int i = 0; i < 5; i++)
-	{
-		(*defrag)[i] = i;
-	}
-
-	(*defrag).erase(1);
-	(*defrag).erase(1);
-	(*defrag).insert(1,1);
-	(*defrag).insert(2,2);
-
-	
-	for(int i = 0; i < (*defrag).size(); i++)
-	{
-		cout << i <<" " << (*defrag)[i] << "\n";
-	}
-	cout << "Defrag\n";
-	(*defrag).defrag();	
-
-	for(int i = 0; i < 5; i++)
-	{
-		cout << (*defrag)[i] << "\n";
-	}
-
-	delete defrag;
+/*
 	
 	cout << "\n\n Other Test \n\n";
 	defrag = new FragmentedList<int>(5);
@@ -179,4 +145,5 @@ int main()
 		cout << (*defrag)[i] << "\n";
 	}
 	return 0;
+	*/
 }

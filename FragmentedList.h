@@ -83,12 +83,14 @@ public:
 		fragListNode * second_addr 	= NULL;
 
 		// Copy over the contents
-		node_temp_first.data  = first->data;
+		node_temp_first.data      = first->data;
+		node_temp_first.freeFlag  = first->freeFlag;
 		node_temp_first.next  = first->next;
 		node_temp_first.prev  = first->prev;
 
 
-		node_temp_second.data = second->data;
+		node_temp_second.data 	  = second->data;
+		node_temp_second.freeFlag = second->freeFlag;
 		node_temp_second.next = second->next;
 		node_temp_second.prev = second->prev;
 
@@ -97,6 +99,7 @@ public:
 		second_addr	= second;
 
 		// Swap the first
+		(first)->freeFlag  = node_temp_second.freeFlag;
 		(first)->data  = node_temp_second.data;
 		(first)->prev  = node_temp_second.prev;
 		
@@ -107,6 +110,7 @@ public:
 
 
 		// Swap the second
+		(second)->freeFlag = node_temp_first.freeFlag;
 		(second)->data = node_temp_first.data;
 		(second)->next = node_temp_first.next;
 
@@ -172,7 +176,7 @@ public:
 			while( list_temp->next != NULL )
 			{
 			  free_temp = freeSpots;
-			  cout << "\n\n=============== DEFRAG [" << std::setfill('0') << std::setw(3) <<defrag_count << "] ============== ";
+			  cout << "\n\n================ DEFRAG [" << std::setfill('0') << std::setw(3) <<defrag_count << "] =============== ";
 			  cout << "   freeSpots \n\n"; 
 			  defrag_count++;
 			  shift = 0;
@@ -182,7 +186,7 @@ public:
 			  	  cout << "F :: ";
 				else
 				  cout << "L :: ";
-				  cout << "[" << std::setfill('0')<< std::setw(9) << (list + shift)->prev << "]= " << std::setfill('0')<< std::setw(9) << (list + shift) << "{" << (int)(list + shift)->data << "}" << " =[" << std::setfill('0')<< std::setw(9) << (list + shift)->next << "]";
+				  cout << "[" << std::setfill('0')<< std::setw(9) << (list + shift)->prev << "] <=" << std::setfill('0')<< std::setw(9) << (list + shift) << "{" << (int)(list + shift)->data << "}" << "=> [" << std::setfill('0')<< std::setw(9) << (list + shift)->next << "]";
 				  
 				if ( free_temp->next != NULL )
 			  	{
@@ -222,10 +226,12 @@ public:
 				  node_temp->prev = NULL;
 			  }
 
-
+			// TODO HERE START
 			  //cout << "3list_temp[" << list_temp << "] head_temp[" << head_temp << "]\n";
-			  if (list_temp == freeSpots )
+			  if ( (list_temp != node_temp && list_temp->freeFlag == 1 && node_temp->freeFlag == 1)
+			  	|| (list_temp != node_temp && list_temp->freeFlag == 0 && node_temp->freeFlag == 1)  )
 			  {
+				 
 				  _swap_nodes(list_temp, node_temp);
 			//	  cout << "4list_temp[" << list_temp << "] node_temp[" << node_temp << "]\n";
 			  }
@@ -262,6 +268,7 @@ public:
 		  {
 			  temp[i].data = it->data;
 			  it = it->next;
+			  temp[i].freeFlag = 0;
 		  }
 
 		  head = temp;
@@ -345,7 +352,6 @@ public:
 		{
 			nnode = freeSpots;
 			freeSpots = freeSpots->next;
-			nnode->freeFlag = 0;
 		}
 
 		nnode->freeFlag = 0;

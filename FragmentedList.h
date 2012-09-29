@@ -74,7 +74,7 @@ public:
 	void _swap_nodes(fragListNode * first, fragListNode * second)
 	{
 		//cout << "_swap_nodes\n";
-	//	cout << "first[" << std::hex << first << "] second[" <<  std::hex << second << "]\n";
+		cout << "first[" << std::hex << first << "] second[" <<  std::hex << second << "]\n";
 
 		fragListNode node_temp_first;
 		fragListNode node_temp_second;
@@ -180,6 +180,7 @@ public:
 			  cout << "   freeSpots \n\n"; 
 			  defrag_count++;
 			  shift = 0;
+				  cout << "list_temp[" << list_temp << "] head_temp[" << head_temp << "]\n";
 			  while ( shift < blockSize )
 			  { 
 			  	if ( (list + shift)->freeFlag )
@@ -205,7 +206,7 @@ public:
 			  }
 			//	  cout << "2list_temp[" << list_temp << "] head_temp[" << head_temp << "]\n";
 		 
-		 	  if ( list_temp->next == NULL )
+		 	  if ( list_temp->next == NULL && list_temp->freeFlag == 0)
 			  break;
 			  // No free spots?
 			  unsigned short allocated_mem = 0;
@@ -231,24 +232,34 @@ public:
 			  if ( (list_temp != node_temp && list_temp->freeFlag == 1 && node_temp->freeFlag == 1)
 			  	|| (list_temp != node_temp && list_temp->freeFlag == 0 && node_temp->freeFlag == 1)  )
 			  {
-				 
+				  
 				  _swap_nodes(list_temp, node_temp);
 			//	  cout << "4list_temp[" << list_temp << "] node_temp[" << node_temp << "]\n";
 			  }
-		  
+            		 	
+
 			  if ( head_temp != NULL )
 				  _swap_nodes(list_temp, head_temp);
+
 		  
 		          list_temp->freeFlag = 0;
-			  //cout << "5list_temp[" << list_temp << "] head_temp[" << head_temp << "]\n";
+//			  cout << "list_temp[" << list_temp << "] head_temp[" << head_temp << "] node_temp["<<node_temp<<"\n";
 		  
-			  if ( allocated_mem == 0 && push_mem_to_stack == 1 )
+			  if ( allocated_mem == 0 && head_temp->freeFlag == 1 )
 			  {
 				 // cout << "Pushing back to stack\n";
 				  head_temp->next = freeSpots;
 				  head_temp->prev = NULL;
 				  head_temp->freeFlag = 1;
 				  freeSpots = head_temp;
+			  }
+			  if ( allocated_mem == 0 && node_temp->freeFlag == 1 )
+			  {
+				 // cout << "Pushing back to stack\n";
+				  node_temp->next = freeSpots;
+				  node_temp->prev = NULL;
+				  node_temp->freeFlag = 1;
+				  freeSpots = node_temp;
 			  }
 
 			  if ( allocated_mem == 1 )

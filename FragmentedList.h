@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <iomanip>
+
 using std::cout;
 
 template <class T>
@@ -38,8 +39,8 @@ public:
 	}
 
 	void resize(int nSize)
-	{
-		// Should this actually resize the current block or
+    {
+        // Should this actually resize the current block or
 		// just reinitialize? Might call it reset.
 		if ( blockSize != 0 || Size != 0 )
 			clean();
@@ -73,7 +74,7 @@ public:
 
 	void _swap_nodes(fragListNode * first, fragListNode * second)
 	{
-		//cout << "_swap_nodes\n";
+        ////cout << "_swap_nodes\n";
 
 		fragListNode node_temp_first;
 		fragListNode node_temp_second;
@@ -120,7 +121,7 @@ public:
 
 
 
-		//cout << "first.data ["<<first->data<<"] second.data ["<<second->data<<"]\n";
+        ////cout << "first.data ["<<first->data<<"] second.data ["<<second->data<<"]\n";
 		
 
 
@@ -168,7 +169,80 @@ public:
 		 // node->next = NULL;
 		}
 		return node;
-	}
+
+    }
+
+
+    void dumpDebug()
+    {
+        fragListNode * free_temp = NULL;
+        fragListNode * list_temp = NULL;
+
+        list_temp = list;
+        free_temp = freeSpots;
+
+        int shift = 0;
+
+        //cout << "\n\n================ DEFRAG [" << std::setfill('0') << "] =============== ";
+        //cout << "   freeSpots \n\n";
+
+        shift = 0;
+        while ( shift < blockSize )
+        {
+          if ( (list + shift)->freeFlag )
+         {   //cout << "F :: ";
+          }
+          else
+          {  //cout << "L :: ";
+              }
+            //cout << "[" << std::setfill('0')<< std::setw(9) << (list + shift)->prev << "] <=" << std::setfill('0')<< std::setw(9) << (list + shift) << "{" << (int)(list + shift)->data << "}" << "=> [" << std::setfill('0')<< std::setw(9) << (list + shift)->next << "]";
+          if ( free_temp != NULL)
+          {
+              //cout << "    [" << std::setfill('0')<< std::setw(9) << free_temp << "]";
+              free_temp = free_temp->next;
+          }
+
+          //cout << "\n";
+          shift++;
+        }
+
+    }
+
+    void shift_to_front_of_free_memory(fragListNode * node)
+    {
+        fragListNode temp;
+
+        if (node->prev == NULL)
+            return;
+
+        temp.data     = node->data;
+        temp.freeFlag = node->freeFlag;
+        temp.next     = node->next;
+        temp.prev     = node->prev;
+
+
+
+
+        // Puts node at front
+        freeSpots->prev = node;
+        node->next = freeSpots;
+        node->prev = NULL;
+        freeSpots = node;
+
+
+        if(temp.next == NULL)
+        {
+            temp.prev->next = NULL;
+        }
+        else
+        {
+            temp.next->prev = temp.prev;
+            temp.prev->next = temp.next;
+        }
+
+
+    }
+
 	void defrag()
 	{
 		/*
@@ -184,12 +258,12 @@ public:
 
 			
 		}*/
-		cout << "\n\n=================== DEFRAG ==================\n";
-		cout <<     "=================== DEFRAG ==================\n";
+        //cout << "\n\n=================== DEFRAG ==================\n";
+        //cout <<     "=================== DEFRAG ==================\n";
 
-		cout << "  Block size [" << Size << " <= " << blockSize << "]\n";
-		cout <<     "=============================================\n";
-		cout <<     "=============================================\n";
+        //cout << "  Block size [" << Size << " <= " << blockSize << "]\n";
+        //cout <<     "=============================================\n";
+        //cout <<     "=============================================\n";
 		
 		if ( Size <= blockSize )
 		{
@@ -206,25 +280,27 @@ public:
 			while( list_temp->next != NULL && list_temp->freeFlag == 0 )
 			{
 			  free_temp = freeSpots;
-			  cout << "\n\n================ DEFRAG [" << std::setfill('0') << std::setw(3) <<defrag_count << "] =============== ";
-			  cout << "   freeSpots \n\n"; 
+              //cout << "\n\n================ DEFRAG [" << std::setfill('0') << std::setw(3) <<defrag_count << "] =============== ";
+              //cout << "   freeSpots \n\n";
 			  defrag_count++;
 			  shift = 0;
-		          cout << "Before Shift | "<< FreeFlag(list_temp)<< " - list_temp[" << list_temp << "] "<< FreeFlag(head_temp)<< " - head_temp[" << head_temp << "] "<< FreeFlag(node_temp)<< " - node_temp["<< node_temp <<"]\n";
+                  //cout << "Before Shift | "<< FreeFlag(list_temp)<< " - list_temp[" << list_temp << "] "<< FreeFlag(head_temp)<< " - head_temp[" << head_temp << "] "<< FreeFlag(node_temp)<< " - node_temp["<< node_temp <<"]\n";
 			  while ( shift < blockSize )
 			  { 
 			  	if ( (list + shift)->freeFlag )
-			  	  cout << "F :: ";
+                { //cout << "F :: ";
+                }
 				else
-				  cout << "L :: ";
-				  cout << "[" << std::setfill('0')<< std::setw(9) << (list + shift)->prev << "] <=" << std::setfill('0')<< std::setw(9) << (list + shift) << "{" << (int)(list + shift)->data << "}" << "=> [" << std::setfill('0')<< std::setw(9) << (list + shift)->next << "]";
+                {  //cout << "L :: ";
+                }
+                  //cout << "[" << std::setfill('0')<< std::setw(9) << (list + shift)->prev << "] <=" << std::setfill('0')<< std::setw(9) << (list + shift) << "{" << (int)(list + shift)->data << "}" << "=> [" << std::setfill('0')<< std::setw(9) << (list + shift)->next << "]";
 				if ( free_temp != NULL)
 			  	{
-					cout << "    [" << std::setfill('0')<< std::setw(9) << free_temp << "]";  
+                    //cout << "    [" << std::setfill('0')<< std::setw(9) << free_temp << "]";
 					free_temp = free_temp->next;
 				}
 				
-				cout << "\n";
+                //cout << "\n";
 				shift++;
 			  }
 			  
@@ -240,19 +316,23 @@ public:
 			  {
 				  push_mem_to_stack = 1;
 				if ( list_temp != freeSpots && list_temp->freeFlag == 1 )
-					_swap_nodes(list_temp, freeSpots);
-				  node_temp = get_free_spot();
-			  }
+                {
+                    // Move memory to front of freeSpots
+                    //_swap_nodes(list_temp, freeSpots);
+                    shift_to_front_of_free_memory(list_temp);
+                }
+                node_temp = get_free_spot();
+              }
 
 			// TODO HERE START
-			  cout << "After Shift | "<< FreeFlag(list_temp)<< " - list_temp[" << list_temp << "] "<< FreeFlag(head_temp)<< " - head_temp[" << head_temp << "] "<< FreeFlag(node_temp)<< " - node_temp["<< node_temp<<"]\n";
+              //cout << "After Shift | "<< FreeFlag(list_temp)<< " - list_temp[" << list_temp << "] "<< FreeFlag(head_temp)<< " - head_temp[" << head_temp << "] "<< FreeFlag(node_temp)<< " - node_temp["<< node_temp<<"]\n";
 			  unsigned char swapped_temp = 0 ;
             		 	
 
 
 			if ( list_temp == node_temp && list_temp->freeFlag == 1 )
 			{
-				cout << "List = Temp\n";
+                //cout << "List = Temp\n";
 				_swap_nodes(list_temp, head_temp);
 				move_to_free(head_temp);	
 			}
@@ -275,22 +355,25 @@ public:
 			free_temp = freeSpots;
 			shift = 0;
 			
-			  cout << "\n\n============ ENDING FRAGMENTATION =========== ";
-			  cout << "   freeSpots \n\n"; 
+              //cout << "\n\n============ ENDING FRAGMENTATION =========== ";
+              //cout << "   freeSpots \n\n";
 			  while ( shift < blockSize )
 			  { 
 			  	if ( (list + shift)->freeFlag )
-			  	  cout << "F :: ";
+                {  //cout << "F :: ";
+                }
 				else
-				  cout << "L :: ";
-				  cout << "[" << std::setfill('0')<< std::setw(9) << (list + shift)->prev << "] <=" << std::setfill('0')<< std::setw(9) << (list + shift) << "{" << (int)(list + shift)->data << "}" << "=> [" << std::setfill('0')<< std::setw(9) << (list + shift)->next << "]";
+                {
+                  //cout << "L :: ";
+                }
+                //cout << "[" << std::setfill('0')<< std::setw(9) << (list + shift)->prev << "] <=" << std::setfill('0')<< std::setw(9) << (list + shift) << "{" << (int)(list + shift)->data << "}" << "=> [" << std::setfill('0')<< std::setw(9) << (list + shift)->next << "]";
 				if ( free_temp != NULL)
 			  	{
-					cout << "    [" << std::setfill('0')<< std::setw(9) << free_temp << "]";  
+                    //cout << "    [" << std::setfill('0')<< std::setw(9) << free_temp << "]";
 					free_temp = free_temp->next;
 				}
 				
-				cout << "\n";
+                //cout << "\n";
 				shift++;
 			  }
 		}
@@ -387,8 +470,12 @@ public:
 		{
 			nnode = freeSpots;
 			freeSpots = freeSpots->next;
+            if ( freeSpots != NULL )
+                freeSpots->prev = NULL;
 		}
 
+        nnode->prev = NULL;
+        nnode->next = NULL;
 		nnode->freeFlag = 0;
 
 		nnode->data = item;

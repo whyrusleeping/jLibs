@@ -7,7 +7,7 @@ int main()
 {
 	FragmentedList<int> fList(10);
 
-	srand(50);
+	srand(time(NULL));
 
 	for(int i = 0; i < 10; i++)
 	{
@@ -55,9 +55,8 @@ int main()
 		cout << fList[i] << "\n";
 	}
 	cout << "\n == END OF TESTS == ";
-	return 0;
-/*
-	
+	FragmentedList<int> * defrag;	
+
 	cout << "\n\n Other Test \n\n";
 	defrag = new FragmentedList<int>(5);
 
@@ -139,11 +138,10 @@ int main()
 	}
 	cout << "Defrag\n";
 	(*defrag).defrag();	
-
+	cout << "Print\n";
 	for(int i = 0; i < (*defrag).size(); i++)
 	{
 		cout << (*defrag)[i] << "\n";
 	}
 	return 0;
-	*/
 }

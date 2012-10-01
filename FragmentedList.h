@@ -74,7 +74,6 @@ public:
 	void _swap_nodes(fragListNode * first, fragListNode * second)
 	{
 		//cout << "_swap_nodes\n";
-		cout << "first[" << std::hex << first << "] second[" <<  std::hex << second << "]\n";
 
 		fragListNode node_temp_first;
 		fragListNode node_temp_second;
@@ -139,7 +138,37 @@ public:
 			node_temp_second.next->prev = first_addr;
 
 	}
+        char FreeFlag(fragListNode * node)
+	{
+		if ( node == NULL ) return 'N';
+		return (node->freeFlag == 1) ? 'F' : 'L';	
+	}
 
+	void move_to_free(fragListNode * node)
+	{
+	    node->next = freeSpots;
+	    if (freeSpots != NULL )
+	    	freeSpots->prev = node;
+	    node->prev = NULL;
+	    node->freeFlag = 1;
+	    freeSpots = node;
+
+	}
+	fragListNode * get_free_spot ()
+	{
+		fragListNode* node = NULL;
+		node = freeSpots;
+		if ( node != NULL )
+		{
+		  freeSpots = freeSpots->next;
+
+		  if ( freeSpots != NULL )
+		  	freeSpots->prev = NULL;
+		 // node->prev = NULL;
+		 // node->next = NULL;
+		}
+		return node;
+	}
 	void defrag()
 	{
 		/*
@@ -161,6 +190,7 @@ public:
 		cout << "  Block size [" << Size << " <= " << blockSize << "]\n";
 		cout <<     "=============================================\n";
 		cout <<     "=============================================\n";
+		
 		if ( Size <= blockSize )
 		{
 		  // Everyting will fit				
@@ -173,14 +203,14 @@ public:
 		
 			list_temp = list;
 			head_temp = head;
-			while( list_temp->next != NULL )
+			while( list_temp->next != NULL && list_temp->freeFlag == 0 )
 			{
 			  free_temp = freeSpots;
 			  cout << "\n\n================ DEFRAG [" << std::setfill('0') << std::setw(3) <<defrag_count << "] =============== ";
 			  cout << "   freeSpots \n\n"; 
 			  defrag_count++;
 			  shift = 0;
-				  cout << "list_temp[" << list_temp << "] head_temp[" << head_temp << "]\n";
+		          cout << "Before Shift | "<< FreeFlag(list_temp)<< " - list_temp[" << list_temp << "] "<< FreeFlag(head_temp)<< " - head_temp[" << head_temp << "] "<< FreeFlag(node_temp)<< " - node_temp["<< node_temp <<"]\n";
 			  while ( shift < blockSize )
 			  { 
 			  	if ( (list + shift)->freeFlag )
@@ -188,8 +218,7 @@ public:
 				else
 				  cout << "L :: ";
 				  cout << "[" << std::setfill('0')<< std::setw(9) << (list + shift)->prev << "] <=" << std::setfill('0')<< std::setw(9) << (list + shift) << "{" << (int)(list + shift)->data << "}" << "=> [" << std::setfill('0')<< std::setw(9) << (list + shift)->next << "]";
-				  
-				if ( free_temp->next != NULL )
+				if ( free_temp != NULL)
 			  	{
 					cout << "    [" << std::setfill('0')<< std::setw(9) << free_temp << "]";  
 					free_temp = free_temp->next;
@@ -200,75 +229,70 @@ public:
 			  }
 			  
 			  // Move up through the block until the list gets out of sync
-			  for ( ; list_temp == head_temp && list_temp->next != NULL ; list_temp += 1, head_temp = head_temp->next )
-			  {
-			///	  cout << "1list_temp[" << list_temp << "] head_temp[" << head_temp << "]\n";
-			  }
-			//	  cout << "2list_temp[" << list_temp << "] head_temp[" << head_temp << "]\n";
+			  for ( ; list_temp == head_temp && list_temp->next != NULL ; list_temp += 1, head_temp = head_temp->next );
 		 
-		 	  if ( list_temp->next == NULL && list_temp->freeFlag == 0)
-			  break;
+
 			  // No free spots?
 			  unsigned short allocated_mem = 0;
 			  unsigned short push_mem_to_stack = 0;
+			  node_temp = NULL;
 			  if ( freeSpots != NULL )
 			  {
 				  push_mem_to_stack = 1;
-				  node_temp = freeSpots;
-				  node_temp->freeFlag = 0;
-				  freeSpots = freeSpots->next;
-			  }
-			  else if( list_temp == freeSpots )
-			  {
-				  allocated_mem = 1;
-				  node_temp = new fragListNode;
-			          node_temp->freeFlag = 0;
-				  node_temp->next = NULL;
-				  node_temp->prev = NULL;
+				if ( list_temp != freeSpots && list_temp->freeFlag == 1 )
+					_swap_nodes(list_temp, freeSpots);
+				  node_temp = get_free_spot();
 			  }
 
 			// TODO HERE START
-			  //cout << "3list_temp[" << list_temp << "] head_temp[" << head_temp << "]\n";
-			  if ( (list_temp != node_temp && list_temp->freeFlag == 1 && node_temp->freeFlag == 1)
-			  	|| (list_temp != node_temp && list_temp->freeFlag == 0 && node_temp->freeFlag == 1)  )
-			  {
-				  
-				  _swap_nodes(list_temp, node_temp);
-			//	  cout << "4list_temp[" << list_temp << "] node_temp[" << node_temp << "]\n";
-			  }
+			  cout << "After Shift | "<< FreeFlag(list_temp)<< " - list_temp[" << list_temp << "] "<< FreeFlag(head_temp)<< " - head_temp[" << head_temp << "] "<< FreeFlag(node_temp)<< " - node_temp["<< node_temp<<"]\n";
+			  unsigned char swapped_temp = 0 ;
             		 	
 
-			  if ( head_temp != NULL )
-				  _swap_nodes(list_temp, head_temp);
 
-		  
-		          list_temp->freeFlag = 0;
-//			  cout << "list_temp[" << list_temp << "] head_temp[" << head_temp << "] node_temp["<<node_temp<<"\n";
-		  
-			  if ( allocated_mem == 0 && head_temp->freeFlag == 1 )
-			  {
-				 // cout << "Pushing back to stack\n";
-				  head_temp->next = freeSpots;
-				  head_temp->prev = NULL;
-				  head_temp->freeFlag = 1;
-				  freeSpots = head_temp;
-			  }
-			  if ( allocated_mem == 0 && node_temp->freeFlag == 1 )
-			  {
-				 // cout << "Pushing back to stack\n";
-				  node_temp->next = freeSpots;
-				  node_temp->prev = NULL;
-				  node_temp->freeFlag = 1;
-				  freeSpots = node_temp;
-			  }
+			if ( list_temp == node_temp && list_temp->freeFlag == 1 )
+			{
+				cout << "List = Temp\n";
+				_swap_nodes(list_temp, head_temp);
+				move_to_free(head_temp);	
+			}
+			else if ( list_temp != node_temp && list_temp->freeFlag == 1 )
+			{
+				_swap_nodes(list_temp, head_temp);
+				move_to_free(head_temp);
+			}
+			else if ( list_temp->freeFlag == 0 && head_temp->freeFlag == 0 )
+			{
+				_swap_nodes(list_temp, head_temp);
+				if ( node_temp != NULL )
+					move_to_free(node_temp);
 
-			  if ( allocated_mem == 1 )
-			  	delete node_temp;
-
+			}
 
 			  head_temp = list_temp;
 			//  std::cin >> a;
 			}
+			free_temp = freeSpots;
+			shift = 0;
+			
+			  cout << "\n\n============ ENDING FRAGMENTATION =========== ";
+			  cout << "   freeSpots \n\n"; 
+			  while ( shift < blockSize )
+			  { 
+			  	if ( (list + shift)->freeFlag )
+			  	  cout << "F :: ";
+				else
+				  cout << "L :: ";
+				  cout << "[" << std::setfill('0')<< std::setw(9) << (list + shift)->prev << "] <=" << std::setfill('0')<< std::setw(9) << (list + shift) << "{" << (int)(list + shift)->data << "}" << "=> [" << std::setfill('0')<< std::setw(9) << (list + shift)->next << "]";
+				if ( free_temp != NULL)
+			  	{
+					cout << "    [" << std::setfill('0')<< std::setw(9) << free_temp << "]";  
+					free_temp = free_temp->next;
+				}
+				
+				cout << "\n";
+				shift++;
+			  }
 		}
 		else
 		{ 
@@ -416,12 +440,10 @@ public:
 			delete n;
 		}
 		else
-		{	
-			n->next = freeSpots;
-			n->prev = NULL;
-			n->freeFlag = 1;
-			freeSpots = n;
+		{
+			move_to_free(n);
 		}
+		
 
 		Size--;		
 		if(index < lastIti)

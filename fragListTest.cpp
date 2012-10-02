@@ -9,12 +9,14 @@ using std::cout;
 int main()
 {
 	int i = 0;
+    srand(time(NULL));
     while ( true )
     {
       FragmentedList<int> fList(LIST_SIZE);
-      srand(time(NULL));
+
       //srand(i);
-	  cout << "\n\nSeed: " << i << "\n";
+      if ( i % 1000 == 0)
+        cout << "\n\nSeed: " << i << "\n";
       for(int i = 0; i < LIST_SIZE; i++)
 	  {
 		  fList[i] = i;

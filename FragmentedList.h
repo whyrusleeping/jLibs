@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <iomanip>
+#include <assert.h>
 
 using std::cout;
 
@@ -55,7 +56,8 @@ public:
 
 	void resize(int nSize)
     {
-        // Should this actually resize the current block or
+ 		assert(nSize >= 0);
+ 		// Should this actually resize the current block or
 		// just reinitialize? Might call it reset.
 		if ( blockSize != 0 || Size != 0 )
 			clean();
@@ -89,7 +91,10 @@ public:
 
 	void _swap_nodes(fragListNode * first, fragListNode * second)
 	{
-        ////cout << "_swap_nodes\n";
+    	assert(first != NULL);
+		assert(second != NULL);
+
+		////cout << "_swap_nodes\n";
 
 		fragListNode node_temp_first;
 		fragListNode node_temp_second;
@@ -98,16 +103,8 @@ public:
 		fragListNode * second_addr 	= NULL;
 
 		// Copy over the contents
-		node_temp_first.data      = first->data;
-		node_temp_first.freeFlag  = first->freeFlag;
-		node_temp_first.next  = first->next;
-		node_temp_first.prev  = first->prev;
-
-
-		node_temp_second.data 	  = second->data;
-		node_temp_second.freeFlag = second->freeFlag;
-		node_temp_second.next = second->next;
-		node_temp_second.prev = second->prev;
+		node_temp_first = *first;
+		node_temp_second = *second;
 
 		// Store the addresses;
 		first_addr 	= first;
@@ -419,12 +416,14 @@ public:
 	}
 
 	T &operator[] (int index)
-	{
+	{	
 		return at(index)->data;
 	}
 
 	fragListNode *at(int index)
 	{
+		assert(list != NULL);
+		assert(index >= 0);
 		if(!fragmented) return &list[index];
 		else
 		{
@@ -440,6 +439,7 @@ public:
 
 	void push_front(T item)
 	{
+		assert(head != NULL);
 		fragListNode *nnode = new fragListNode;
 		nnode->data = item;
 		nnode->next = head;
@@ -453,6 +453,7 @@ public:
 
 	T pop_front()
 	{
+		assert(head != NULL);
 		T ret = head->data;
 		erase(0);
 		return ret;		
@@ -476,6 +477,7 @@ public:
 
 	void insert(T item, int index)
 	{	
+		assert(index >= 0);
 		fragListNode *nnode;// = new fragListNode;
 	
 		//attempt to reuse memory

@@ -18,8 +18,8 @@ public:
 
 	T erase(int index);
 
-
-	void push_back(T p);
+	void insert(T item, int index);
+	void push_back(T item);
 
 	int size();
 
@@ -54,7 +54,7 @@ jVector<T>::~jVector()
 template <class T>
 void jVector<T>::resize(int n)
 {
-	assert(n >= 0)
+	assert(n >= 0);
 	if(lis == NULL)
 	{
 		lis = new T[n];
@@ -100,4 +100,14 @@ void jVector<T>::push_back(T p)
 	lis = new(lis) T[++Size];
 	(*this)[Size - 1] = p;
 }
+
+template <class T>
+void jVector<T>::insert(T item, int index)
+{
+	lis = new(lis) T[++Size];
+	for(int i = Size-1; i > index; i--)
+		lis[i] = lis[i-1];
+	lis[index] = item;
+}
+
 #endif

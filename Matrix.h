@@ -1,4 +1,5 @@
 #include <iostream>
+#include <assert.h>
 #include <jVector.h>
 
 template <class T>
@@ -28,7 +29,7 @@ Matrix<T>::Matrix(int width, int length)
 {
 	assert(width >= 0);
 	assert(length >= 0);
-	resize(w,l);
+	resize(width,length);
 }
 
 template <class T>

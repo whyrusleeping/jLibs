@@ -2,6 +2,12 @@
 #include <assert.h>
 #include <jVector.h>
 
+typedef struct _coord
+{
+	int x;
+	int y;
+}coord;
+
 template <class T>
 class Matrix
 {
@@ -9,8 +15,13 @@ class Matrix
 		Matrix();
 		Matrix(int width, int length);
 		~Matrix();
-
+		
+		bool inMatrix(int x, int y);
 		void resize(int width, int length);
+		int width();
+		int length();
+		T &operator[] (coord at);
+		T &operator[] (int x, int y);
 	private:
 		jVector<jVector<T> > matrix;
 		int w;
@@ -46,4 +57,35 @@ void Matrix<T>::resize(int width, int length)
 	{
 		matrix[i].resize(length);
 	}
+	w = width;
+	l = length;
+}
+
+template <class T>
+bool Matrix<T>::inMatrix(int x, int y)
+{
+	return (x >= 0 && x < w && y >= 0 && y < l);
+}
+
+template <class T>
+int Matrix<T>::width()
+{
+	return w;
+}
+
+template <class T>
+int Matrix<T>::length()
+{
+	return l;
+}
+template <class T>
+T &Matrix<T>::operator[] (coord c)
+{
+	return matrix[c.x][c.y];	
+}
+	
+template <class T>
+T &Matrix<T>::operator[] (int x, int y)
+{
+	return matrix[x][y];	
 }

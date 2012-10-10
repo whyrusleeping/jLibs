@@ -8,12 +8,18 @@ int main()
 {
 
 	jVector<int> v(5);
-	DO(5)
+	
+	for(int i = 0; i < 5; i++)
 	{
 		v[i] = i;
 	}	
 
+	for(int i = 0; i < 5; i++)
+		cout << v[i] << "\n";
+
+	cout << "inserting 10.\n";
 	v.insert(10,3);
+	//v.push_back(10);
 
 
 	DO(v.size())

@@ -106,8 +106,8 @@ void jVector<T>::insert(T item, int index)
 {
 	lis = new(lis) T[++Size];
 	for(int i = Size-1; i > index; i--)
-		lis[i] = lis[i-1];
-	lis[index] = item;
+		(*this)[i] = (*this)[i-1];
+	(*this)[index] = item;
 }
 
 #endif

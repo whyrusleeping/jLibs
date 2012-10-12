@@ -40,7 +40,7 @@ public:
 
 	void resize(int nSize)
     {
-        // Should this actually resize the current block or
+                // Should this actually resize the current block or
 		// just reinitialize? Might call it reset.
 		if ( blockSize != 0 || Size != 0 )
 			clean();

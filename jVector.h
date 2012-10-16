@@ -2,6 +2,7 @@
 #define __J_VECTOR_H__
 
 #include <iostream>
+#include <assert.h>
 
 using std::cout;
 template <class T>
@@ -9,6 +10,7 @@ class jVector
 {
 public:
 	jVector();
+	jVector(int initSize);
 	~jVector();
 
 	void resize(int n);
@@ -16,72 +18,96 @@ public:
 
 	T erase(int index);
 
+	void insert(T item, int index);
+	void push_back(T item);
 
-	void push_back(T p);
-
-	int Size();
+	int size();
 
 private:
 	T *lis;
-	int size;
+	int Size;
 	bool autoShrink;
 };
 
-
-jVector::jVector()
+template <class T>
+jVector<T>::jVector()
 {
 	lis = NULL;
-	size = 0;
+	Size = 0;
 }
 
-jVector::~jVector()
+template <class T>
+jVector<T>::jVector(int initSize)
+{
+	assert(initSize >= 0);
+	lis = NULL;
+	Size = 0;
+	resize(initSize);
+}
+
+template <class T>
+jVector<T>::~jVector()
 {
 	free(lis);
 }
 
 template <class T>
-void jVector::resize(int n)
+void jVector<T>::resize(int n)
 {
+	assert(n >= 0);
 	if(lis == NULL)
 	{
-		lis = (T *)malloc(sizeof(T) * n);
+		lis = new T[n];
 	}	
 	else
 	{
-		if(n > size)
+		if(n > Size)
 		{
-			lis = (T *)realloc(lis, sizeof(T) * n);
+			lis = new(lis) T[n];
 		}
-		if(autoShrink && n < size)
+		if(autoShrink && n < Size)
 		{
-			lis = (T *)realloc(lis, sizeof(T) * n);
+			lis = new(lis) T[n];
 		}
 	}
-	size = n;
+	Size = n;
 }
 
 template <class T>
-T &jVector::operator[] (int i )
+T &jVector<T>::operator[] (int i )
 {
-	return *(lis + sizeof(T) * i);
+	assert(i >= 0);
+	return *(lis + (sizeof(T) * i));
 }
 
-int jVector::Size()
+template <class T>
+int jVector<T>::size()
 {
-	return size;
+	return Size;
 }
 
-T jVector::erase(int index)
+template <class T>
+T jVector<T>::erase(int index)
 {
-	for(; index < size - 1; index++)
+	for(; index < Size - 1; index++)
 		(*this)[index] = (*this)[index+1];
-	size--;
+	Size--;
 }
 
 template <class T>
-void jVector::push_back(T p)
+void jVector<T>::push_back(T p)
 {
-	lis = (T *)realloc(lis, ++size * sizeof(T));
-	(*this)[size - 1] = p;
+	lis = new(lis) T[++Size];
+	(*this)[Size - 1] = p;
 }
+
+template <class T>
+void jVector<T>::insert(T item, int index)
+{
+	lis = new(lis) T[++Size];
+	for(int i = Size-1; i > index; i--)
+		(*this)[i] = (*this)[i-1];
+	(*this)[index] = item;
+}
+
 #endif

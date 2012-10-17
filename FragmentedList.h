@@ -118,46 +118,51 @@ public:
 
 			block_head_temp = memory_block_head_;
 			list_head_temp	= list_head_;
+			
 
 			while( block_head_temp->next != NULL && block_head_temp->freeFlag == 0 )
 			{
-				free_temp = open_memory_;
-
-				block_head_offset = 0;
-
+				
 				DEBUG_CODE()
-				{	
-					cout << "\n\n\nBefore Shift | "<< FreeFlag(block_head_temp)<< " - block_head_temp[" << block_head_temp << "] "<< FreeFlag(list_head_temp)<< " - list_head_temp[" << list_head_temp << "] "<< FreeFlag(node_temp)<< " - node_temp["<< node_temp <<"]\n";
-					cout << "\n\n================ DEFRAG [" << std::setfill('0') << std::setw(3) <<defrag_count << "] =============== ";
-					cout << "   open_memory_ \n\n";
-				}
-
-				defrag_count++;
-
-				while ( block_head_offset < memory_block_size_ )
 				{
+					free_temp = open_memory_;
+
+					block_head_offset = 0;
+
 					DEBUG_CODE()
 					{	
-						cout << FreeFlag(memory_block_head_ + block_head_offset) << " :: ";
-						cout << "[" << std::setfill('0')<< std::setw(9) << (memory_block_head_ + block_head_offset)->prev << "] <=" << std::setfill('0')<< std::setw(9) << (memory_block_head_ + block_head_offset) << "{" << (int)(memory_block_head_ + block_head_offset)->data << "}" << "=> [" << std::setfill('0')<< std::setw(9) << (memory_block_head_ + block_head_offset)->next << "]";
+						cout << "\n\n\nBefore Shift | "<< FreeFlag(block_head_temp)<< " - block_head_temp[" << block_head_temp << "] "<< FreeFlag(list_head_temp)<< " - list_head_temp[" << list_head_temp << "] "<< FreeFlag(node_temp)<< " - node_temp["<< node_temp <<"]\n";
+						cout << "\n\n================ DEFRAG [" << std::setfill('0') << std::setw(3) <<defrag_count << "] =============== ";
+						cout << "   open_memory_ \n\n";
 					}
 
-					if ( free_temp != NULL)
+					defrag_count++;
+
+					while ( block_head_offset < memory_block_size_ )
 					{
-						DEBUG_CODE()	
-						{
-							cout << "    [" << std::setfill('0')<< std::setw(9) << free_temp << "]";
+						DEBUG_CODE()
+						{	
+							cout << FreeFlag(memory_block_head_ + block_head_offset) << " :: ";
+							cout << "[" << std::setfill('0')<< std::setw(9) << (memory_block_head_ + block_head_offset)->prev << "] <=" << std::setfill('0')<< std::setw(9) << (memory_block_head_ + block_head_offset) << "{" << (int)(memory_block_head_ + block_head_offset)->data << "}" << "=> [" << std::setfill('0')<< std::setw(9) << (memory_block_head_ + block_head_offset)->next << "]";
 						}
 
-						free_temp = free_temp->next;
-					}
+						if ( free_temp != NULL)
+						{
+							DEBUG_CODE()	
+							{
+								cout << "    [" << std::setfill('0')<< std::setw(9) << free_temp << "]";
+							}
 
-					DEBUG_CODE()
-					{	
-						cout << "\n";
-					}
+							free_temp = free_temp->next;
+						}
 
-					block_head_offset++;
+						DEBUG_CODE()
+						{	
+							cout << "\n";
+						}
+
+						block_head_offset++;
+					}
 				}
 
 				// Move up through the block until the memory_block_head_ gets out of sync
@@ -217,28 +222,24 @@ public:
 			{
 				cout << "\n\n============ ENDING FRAGMENTATION =========== ";
 				cout << "   open_memory_ \n\n";
-			}
 
-			while ( block_head_offset < memory_block_size_ )
-			{
-				DEBUG_CODE()
+
+
+				while ( block_head_offset < memory_block_size_ )
 				{
 					cout << FreeFlag(memory_block_head_ + block_head_offset) << " :: ";
 					cout << "[" << std::setfill('0')<< std::setw(9) << (memory_block_head_ + block_head_offset)->prev << "] <=" << std::setfill('0')<< std::setw(9) << (memory_block_head_ + block_head_offset) << "{" << (int)(memory_block_head_ + block_head_offset)->data << "}" << "=> [" << std::setfill('0')<< std::setw(9) << (memory_block_head_ + block_head_offset)->next << "]";
-				}
 
-				if ( free_temp != NULL)
-				{
-					DEBUG_CODE()
+					if ( free_temp != NULL)
 					{
 						cout << "    [" << std::setfill('0')<< std::setw(9) << free_temp << "]";
+
+						free_temp = free_temp->next;
 					}
 
-					free_temp = free_temp->next;
+					cout << "\n";
+					block_head_offset++;
 				}
-
-				DEBUG_CODE() cout << "\n";
-				block_head_offset++;
 			}
 		}
 		else
@@ -320,9 +321,9 @@ public:
 		//just keep a tail pointer, idiot.
 		nnode->prev = at(current_size_-1)->next;
 
-		nnode->freeFlag = 0;
-		nnode->prev->next = nnode;
-		nnode->next = NULL;
+		nnode->freeFlag		= 0;
+		nnode->prev->next	= nnode;
+		nnode->next			= NULL;
 		current_size_++;
 
 	}
@@ -337,30 +338,32 @@ public:
 			nnode = new fragListNode;
 		else
 		{
-			nnode = open_memory_;
-			open_memory_ = open_memory_->next;
+			nnode			= open_memory_;
+			open_memory_	= open_memory_->next;
+
 			if ( open_memory_ != NULL )
 				open_memory_->prev = NULL;
 		}
 
-		nnode->prev = NULL;
-		nnode->next = NULL;
-		nnode->freeFlag = 0;
+		nnode->prev			= NULL;
+		nnode->next			= NULL;
+		nnode->freeFlag		= 0;
 
-		nnode->data = item;
-		fragListNode *temp = at(index);
-		nnode->next = temp;
+		nnode->data			= item;
+		fragListNode *temp	= at(index);
+		nnode->next			= temp;
+
 		if(index > 0)
 		{
-			temp->prev->next = nnode;
-			nnode->prev = temp->prev;
-			temp->prev = nnode;
+			temp->prev->next	= nnode;
+			nnode->prev			= temp->prev;
+			temp->prev			= nnode;
 		}
 		else
 		{
 			nnode->prev = NULL;
-			temp->prev = nnode;
-			list_head_ = nnode;
+			temp->prev	= nnode;
+			list_head_	= nnode;
 		}
 
 		fragmented_ = true;
@@ -380,15 +383,15 @@ public:
 		else if(n->prev == NULL)
 		{
 			//keep separate memory pointer
-			fragmented_ = true;
-			n->next->prev = NULL;
-			list_head_ = n->next;
+			fragmented_		= true;
+			n->next->prev	= NULL;
+			list_head_		= n->next;
 		}
 		else
 		{
-			fragmented_ = true;
-			n->next->prev = n->prev;
-			n->prev->next = n->next;
+			fragmented_		= true;
+			n->next->prev	= n->prev;
+			n->prev->next	= n->next;
 		}
 		//manage the now unused memory`
 		if(!(n >= memory_block_head_ && n <= memory_block_head_ + (sizeof(fragListNode) * memory_block_size_)))
@@ -409,48 +412,45 @@ public:
 		}
 		if(index == last_access_index_)
 		{
-			last_access_index_ = 0;
+			last_access_index_	= 0;
 			list_last_position_ = list_head_;
 		}
 	}
 	void dumpDebug()
 	{
-		DEBUG_CODE()
+		fragListNode * free_temp		= NULL;
+		fragListNode * block_head_temp	= NULL;
+
+		block_head_temp	= memory_block_head_;
+		free_temp		= open_memory_;
+
+		int block_head_offset = 0;
+
+		cout << "\n\n================ DEFRAG [" << std::setfill('0') << "] =============== ";
+		cout << "   open_memory_ \n\n";
+
+		block_head_offset = 0;
+		while ( block_head_offset < memory_block_size_ )
 		{
-			fragListNode * free_temp = NULL;
-			fragListNode * block_head_temp = NULL;
-
-			block_head_temp = memory_block_head_;
-			free_temp = open_memory_;
-
-			int block_head_offset = 0;
-
-			cout << "\n\n================ DEFRAG [" << std::setfill('0') << "] =============== ";
-			cout << "   open_memory_ \n\n";
-
-			block_head_offset = 0;
-			while ( block_head_offset < memory_block_size_ )
-			{
-				if ( (memory_block_head_ + block_head_offset)->freeFlag )
-				{	
-					cout << "F :: ";
-				}
-				else
-				{	
-					cout << "L :: ";
-				}
-				
-				cout << "[" << std::setfill('0')<< std::setw(9) << (memory_block_head_ + block_head_offset)->prev << "] <=" << std::setfill('0')<< std::setw(9) << (memory_block_head_ + block_head_offset) << "{" << (int)(memory_block_head_ + block_head_offset)->data << "}" << "=> [" << std::setfill('0')<< std::setw(9) << (memory_block_head_ + block_head_offset)->next << "]";
-
-				if ( free_temp != NULL)
-				{
-					cout << "    [" << std::setfill('0')<< std::setw(9) << free_temp << "]";
-					free_temp = free_temp->next;
-				}
-
-				cout << "\n";
-				block_head_offset++;
+			if ( (memory_block_head_ + block_head_offset)->freeFlag )
+			{	
+				cout << "F :: ";
 			}
+			else
+			{	
+				cout << "L :: ";
+			}
+			
+			cout << "[" << std::setfill('0')<< std::setw(9) << (memory_block_head_ + block_head_offset)->prev << "] <=" << std::setfill('0')<< std::setw(9) << (memory_block_head_ + block_head_offset) << "{" << (int)(memory_block_head_ + block_head_offset)->data << "}" << "=> [" << std::setfill('0')<< std::setw(9) << (memory_block_head_ + block_head_offset)->next << "]";
+
+			if ( free_temp != NULL)
+			{
+				cout << "    [" << std::setfill('0')<< std::setw(9) << free_temp << "]";
+				free_temp = free_temp->next;
+			}
+
+			cout << "\n";
+			block_head_offset++;
 		}
 	}
 
@@ -503,8 +503,6 @@ private:
 		temp.prev     = node->prev;
 
 
-
-
 		// Puts node at front
 		open_memory_->prev = node;
 		node->next = open_memory_;
@@ -521,7 +519,6 @@ private:
 			temp.next->prev = temp.prev;
 			temp.prev->next = temp.next;
 		}
-
 
 	}
 	void _swap_nodes(fragListNode * first, fragListNode * second)

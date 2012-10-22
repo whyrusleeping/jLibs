@@ -10,7 +10,7 @@ int main()
 {
 	int i = 0;
     srand(time(NULL));
-    /*while ( true )
+    while ( true )
     {
       FragmentedList<int> fList(LIST_SIZE);
 
@@ -38,7 +38,7 @@ int main()
 		  //cout << " " <<fList[i] << "\n";
 	  }
 
-	  fList.defrag();
+	//  fList.defrag();
 	  //cout << "\n\nAfter Defrag:\n";
 	  for(int i = 0; i < fList.size(); i++)
 	  {
@@ -46,13 +46,13 @@ int main()
 	  }
 
 	  //cout << "\n\nInserting:\n";
-       fList.dumpDebug();;
+      // fList.dumpDebug();;
       for(int i = 0; i < LIST_SIZE/4; i++)
 	  {
 		  int iv = rand() % fList.size();
 		  //cout << " list[" << iv << "]\n";
 		  fList.insert(-52, iv);
-           fList.dumpDebug();;
+       //    fList.dumpDebug();;
 	  }
 	  //fList.insert(-52,fList.size() - 1);
 	  //fList.insert(-52, 0);
@@ -66,9 +66,9 @@ int main()
 	  }
       	  //cout << "\n == END OF TESTS SET ONE == " << i;
 	  i++;
-      fList.dumpDebug();;
+      //fList.dumpDebug();;
       }
-      return 0; */
+      return 0; 
 	FragmentedList<int> * defrag;	
 
 	cout << "\n\n == Two Nodes Reversed == \n\n";

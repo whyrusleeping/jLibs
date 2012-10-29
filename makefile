@@ -14,5 +14,3 @@ vectorTest:
 matrixTest:
 	$(CC) matrixTest.cpp -std=c++0x -o matrixTest
 
-heapTest:
-	$(CC) heapTest.cpp -o heapTest

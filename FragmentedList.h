@@ -60,15 +60,23 @@ public:
 	void resize(const int nSize)
 	{
 		assert(nSize >= 0);
-		// Should this actually resize the current block or
-		// just reinitialize? Might call it reset.
-		if ( memory_block_size_ != 0 || current_size_ != 0 )
-			clean();
-
-		current_size_		= nSize;
+		if (fragmented_)
+        {
+            if ( memory_block_size_ != 0 || current_size_ != 0 )
+    			clean();
+    		memory_block_head_	= new fragListNode[nSize];
+            //Data still lost.
+        }
+        else
+        {
+            if(memory_block_head_ != NULL)
+                memory_block_head_ = new(memory_block_head_) fragListNode[nSize];
+            else
+                memory_block_head_ = new fragListNode[nSize];
+        }
+        current_size_		= nSize;
 		memory_block_size_	= current_size_;
 		open_memory_		= NULL;
-		memory_block_head_	= new fragListNode[nSize];
 		list_head_			= memory_block_head_;
 		last_access_index_	= 0;
 		list_last_position_ = list_head_;

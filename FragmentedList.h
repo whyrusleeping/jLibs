@@ -57,15 +57,24 @@ public:
 	void resize(int nSize)
     {
  		assert(nSize >= 0);
- 		// Should this actually resize the current block or
-		// just reinitialize? Might call it reset.
-		if ( blockSize != 0 || Size != 0 )
-			clean();
+ 		
+		
+		if (fragmented)
+		{
+			if ( blockSize != 0 || Size != 0 )
+				clean();
+			list = new fragListNode[nSize];
+			//Still lose all data
+		}
+		else
+		{
+			list = new(list) fragListNode[nSize];
+		}
 
+		//Reset Block
 		Size = nSize;
 		blockSize = Size;
 		freeSpots = NULL;
-		list = new fragListNode[nSize];
 		head = list;
 		link();
 		lastIti = 0;
@@ -130,13 +139,7 @@ public:
 		  (second)->prev = node_temp_second.next;
 		else
 		  (second)->prev = node_temp_first.prev;
-
-
-
-        ////cout << "first.data ["<<first->data<<"] second.data ["<<second->data<<"]\n";
-		
-
-
+	
 		// Swap the "surounding" pointers
 		if (node_temp_second.prev != NULL)
 			node_temp_second.prev->next = first_addr;
@@ -151,7 +154,8 @@ public:
 			node_temp_second.next->prev = first_addr;
 
 	}
-        char FreeFlag(fragListNode * node)
+   
+   	char FreeFlag(fragListNode * node)
 	{
 		if ( node == NULL ) return 'N';
 		return (node->freeFlag == 1) ? 'F' : 'L';	
@@ -165,8 +169,8 @@ public:
 	    node->prev = NULL;
 	    node->freeFlag = 1;
 	    freeSpots = node;
-
 	}
+
 	fragListNode * get_free_spot ()
 	{
 		fragListNode* node = NULL;
@@ -177,13 +181,9 @@ public:
 
 		  if ( freeSpots != NULL )
 		  	freeSpots->prev = NULL;
-		 // node->prev = NULL;
-		 // node->next = NULL;
 		}
 		return node;
-
     }
-
 
     void dumpDebug()
     {
@@ -195,29 +195,15 @@ public:
 
         int shift = 0;
 
-        //cout << "\n\n================ DEFRAG [" << std::setfill('0') << "] =============== ";
-        //cout << "   freeSpots \n\n";
-
         shift = 0;
         while ( shift < blockSize )
         {
-          if ( (list + shift)->freeFlag )
-         {   //cout << "F :: ";
-          }
-          else
-          {  //cout << "L :: ";
-              }
-            //cout << "[" << std::setfill('0')<< std::setw(9) << (list + shift)->prev << "] <=" << std::setfill('0')<< std::setw(9) << (list + shift) << "{" << (int)(list + shift)->data << "}" << "=> [" << std::setfill('0')<< std::setw(9) << (list + shift)->next << "]";
           if ( free_temp != NULL)
           {
-              //cout << "    [" << std::setfill('0')<< std::setw(9) << free_temp << "]";
-              free_temp = free_temp->next;
+			  free_temp = free_temp->next;
           }
-
-          //cout << "\n";
           shift++;
         }
-
     }
 
     void shift_to_front_of_free_memory(fragListNode * node)
@@ -232,15 +218,11 @@ public:
         temp.next     = node->next;
         temp.prev     = node->prev;
 
-
-
-
         // Puts node at front
         freeSpots->prev = node;
         node->next = freeSpots;
         node->prev = NULL;
         freeSpots = node;
-
 
         if(temp.next == NULL)
         {
@@ -251,32 +233,11 @@ public:
             temp.next->prev = temp.prev;
             temp.prev->next = temp.next;
         }
-
-
     }
 
 	void defrag()
 	{
-		/*
-		 * An attempt to just move the memory up 
-		if(blockSize > Size)
-		{
-			T tempA;
-			T tempB;
-			fragListNode *it = head;
-			int i = 0;
-			
-			for(; i < Size && it == &list[i]; i++, it = it->next);
-
-			
-		}*/
-        //cout << "\n\n=================== DEFRAG ==================\n";
-        //cout <<     "=================== DEFRAG ==================\n";
-
-        //cout << "  Block size [" << Size << " <= " << blockSize << "]\n";
-        //cout <<     "=============================================\n";
-        //cout <<     "=============================================\n";
-		
+	
 		if ( Size <= blockSize )
 		{
 		  // Everyting will fit				
@@ -292,28 +253,16 @@ public:
 			while( list_temp->next != NULL && list_temp->freeFlag == 0 )
 			{
 			  free_temp = freeSpots;
-              //cout << "\n\n================ DEFRAG [" << std::setfill('0') << std::setw(3) <<defrag_count << "] =============== ";
-              //cout << "   freeSpots \n\n";
-			  defrag_count++;
+   			  defrag_count++;
 			  shift = 0;
-                  //cout << "Before Shift | "<< FreeFlag(list_temp)<< " - list_temp[" << list_temp << "] "<< FreeFlag(head_temp)<< " - head_temp[" << head_temp << "] "<< FreeFlag(node_temp)<< " - node_temp["<< node_temp <<"]\n";
-			  while ( shift < blockSize )
+   			  while ( shift < blockSize )
 			  { 
-			  	if ( (list + shift)->freeFlag )
-                { //cout << "F :: ";
-                }
-				else
-                {  //cout << "L :: ";
-                }
-                  //cout << "[" << std::setfill('0')<< std::setw(9) << (list + shift)->prev << "] <=" << std::setfill('0')<< std::setw(9) << (list + shift) << "{" << (int)(list + shift)->data << "}" << "=> [" << std::setfill('0')<< std::setw(9) << (list + shift)->next << "]";
 				if ( free_temp != NULL)
 			  	{
-                    //cout << "    [" << std::setfill('0')<< std::setw(9) << free_temp << "]";
-					free_temp = free_temp->next;
+   					free_temp = free_temp->next;
 				}
 				
-                //cout << "\n";
-				shift++;
+   				shift++;
 			  }
 			  
 			  // Move up through the block until the list gets out of sync
@@ -336,15 +285,12 @@ public:
                 node_temp = get_free_spot();
               }
 
-			// TODO HERE START
-              //cout << "After Shift | "<< FreeFlag(list_temp)<< " - list_temp[" << list_temp << "] "<< FreeFlag(head_temp)<< " - head_temp[" << head_temp << "] "<< FreeFlag(node_temp)<< " - node_temp["<< node_temp<<"]\n";
 			  unsigned char swapped_temp = 0 ;
             		 	
 
 
 			if ( list_temp == node_temp && list_temp->freeFlag == 1 )
 			{
-                //cout << "List = Temp\n";
 				_swap_nodes(list_temp, head_temp);
 				move_to_free(head_temp);	
 			}

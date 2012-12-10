@@ -17,7 +17,7 @@ int jHashTable::hash(string s)
 	return h % _table.size();
 }
 
-int jHashTable::findOpen(string s)
+int jHashTable::findOpen(const string &s)
 {
 	int h = hash(s);
 	int j = h;
@@ -36,16 +36,34 @@ void jHashTable::insert(string key, string val)
 	_table[o] = new pair(key, val);
 }
 
-string jHashTable::find(string key)
+string jHashTable::find(const string &key)
 {
 	int h = hash(key);
+	int j = h;
 	int fail = 0;
 	while(_table[h] != NULL && _table[h]->key != key)
 	{
+		fail++;
+		h = (j + (fail * fail)) % _table.size();
+	}
+	return _table[h]->val;
+}
 
+string &jHashTable::operator[] (const string &key)
+{
+	int h = hash(key);
+	int j = h;
+	int fail = 0;
+	while(_table[h] != NULL && _table[h]->key != key)
+	{
+		fail++;
+		h = (j + (fail * fail)) % _table.size();
 	}
 	if(_table[h] == NULL)
-		return "NOT FOUND";
+	{
+		_table[h] = new pair(key, "");
+		return _table[h]->val;
+	}
 	else
 		return _table[h]->val;
 }

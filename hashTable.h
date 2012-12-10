@@ -24,11 +24,12 @@ class jHashTable
 		jHashTable(int size);
 		void insert(string key, string value);
 		int hash(string s);
-		string find(string key);
+		string find(const string &key);
+		string &operator[](const string &key);
 	private:
 		vector<pair*> _table;
 
-		int findOpen(string s);
+		int findOpen(const string &s);
 };
 
 #endif

@@ -84,6 +84,8 @@ class FragmentedList
 		void link()
 		{
 			//Link each node together, even though they are contiguous
+			//This allows the list to be treated as a linked list
+			//in cases where rapid insert/delete operations are needed
 			memory_block_head_[0].prev = NULL;
 			for(int i = 0; i < current_size_-1; i++)
 			{
@@ -99,8 +101,13 @@ class FragmentedList
 			return current_size_;
 		}
 
+		//Organizes a fragmented list into its correct order so it can be
+		//iterated over as an array and accessed as such
 		void defrag()
 		{
+			if(!fragmented_)
+				return;
+				
 			DEBUG_CODE()
 			{
 				cout << "\n\n=================== DEFRAG ==================\n";
@@ -111,9 +118,9 @@ class FragmentedList
 				cout <<     "=============================================\n";
 			}
 
+			//Case where we have enough memory in our contiguous block for all the items
 			if ( current_size_ <= memory_block_size_ )
 			{
-				// Everyting will fit
 				fragListNode * block_head_temp	= NULL, * list_head_temp = NULL;
 				fragListNode * node_temp		= NULL;
 				fragListNode * free_temp		= NULL;
@@ -260,7 +267,6 @@ class FragmentedList
 
 				list_head_ = temp;
 
-				//open_memory_ was keeping track of memory that was being deleted, and when i went to delete it, was causing the system to freak out
 				open_memory_ = NULL;
 				delete[] memory_block_head_;
 				memory_block_head_ = list_head_;
@@ -284,7 +290,7 @@ class FragmentedList
 			if(!fragmented_) return &memory_block_head_[index];
 			else
 			{
-				if(index < last_access_index_)// || true)
+				if(index < last_access_index_)
 				{
 					last_access_index_ = 0;
 					list_last_position_ = list_head_;
